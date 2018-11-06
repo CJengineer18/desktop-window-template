@@ -35,7 +35,7 @@ import com.github.cjengineer18.desktop.window.template.exception.InvalidParamete
  */
 public class StandardMenuFactory {
 
-	/** Para indicar donde hay un separador. */
+	/** Indicates where's the separator. */
 	public static final String SEPARATOR = "_separator";
 
 	/**
