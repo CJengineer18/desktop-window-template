@@ -54,7 +54,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	/* Private Constants */
 
 	private static final long serialVersionUID = 68482L;
-	private static final Dimension minimumSize = new Dimension(640, 480);
+	private static final Dimension minimumSize = new Dimension(200, 200);
 
 	/* Private Attributes */
 
@@ -278,9 +278,9 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * @param title
 	 *            Window title.
 	 * @param width
-	 *            Window width. The minimum must be 640px.
+	 *            Window width. The minimum must be 200px.
 	 * @param height
-	 *            Window height. The minimum must be 480px.
+	 *            Window height. The minimum must be 200px.
 	 * @param fixedWindow
 	 *            Will the window be fixed size?
 	 * @param typeClosingWindow
@@ -319,7 +319,6 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			dummy.setLayout(null);
 			dummy.pack();
 			Insets windowInsets = (Insets) dummy.getInsets().clone();
-			// System.err.println(windowInsets);
 			realSize = createWorkArea(originalSize, windowInsets);
 			setSize(realSize);
 			setPreferredSize(realSize);
