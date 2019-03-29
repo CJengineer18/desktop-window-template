@@ -7,6 +7,7 @@ This allows to create a new JFrame for any Java application. Includes factory to
 You only create a new class and extend for ```JGenericWindow``` class. In the constructor, call the function ```loadWorkArea()```, implement the method ```workArea()``` with you content, and the window is ready to show!
 
 ## Changes
+- 29-03-2019: Reduce minimum size (640x480 -> 200x200)
 - 05-11-2018: First public version (v1.1-alpha) 
 
 Documentation: https://cjengineer18.github.io/DesktopWindowTemplate/
