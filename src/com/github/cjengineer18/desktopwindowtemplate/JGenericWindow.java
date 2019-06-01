@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template;
+package com.github.cjengineer18.desktopwindowtemplate;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -38,8 +38,8 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import com.github.cjengineer18.desktop.window.template.exception.InvalidCommandException;
-import com.github.cjengineer18.desktop.window.template.exception.InvalidParameterException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidCommandException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
 
 /**
  * Generic window for any desktop application.

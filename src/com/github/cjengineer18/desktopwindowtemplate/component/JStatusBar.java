@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.component;
+package com.github.cjengineer18.desktopwindowtemplate.component;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,8 +33,8 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import com.github.cjengineer18.desktop.window.template.exception.InvalidParameterException;
-import com.github.cjengineer18.desktop.window.template.exception.UnavailableComponentException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.UnavailableComponentException;
 
 /**
  * Create a status bar that can be placed at the end of the window.

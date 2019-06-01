@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.util.async;
+package com.github.cjengineer18.desktopwindowtemplate.util.async;
 
 import java.awt.Window;
 import java.util.ResourceBundle;
@@ -27,8 +27,8 @@ import java.util.ResourceBundle;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-import com.github.cjengineer18.desktop.window.template.component.WaitingPanel;
-import com.github.cjengineer18.desktop.window.template.util.factory.DialogMaker;
+import com.github.cjengineer18.desktopwindowtemplate.component.WaitingPanel;
+import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
 /**
  * An utility method for async process (no return).
@@ -37,7 +37,7 @@ import com.github.cjengineer18.desktop.window.template.util.factory.DialogMaker;
  */
 public abstract class AsyncProcessLoading {
 
-	private static final String BUNDLE_LOCALE = "com.github.cjengineer18.desktop.window.template.resources.bundle.loading";
+	private static final String BUNDLE_LOCALE = "com.github.cjengineer18.desktopwindowtemplate.resources.bundle.loading";
 
 	/**
 	 * Load asynchronously a process. A loading dialog will appear.

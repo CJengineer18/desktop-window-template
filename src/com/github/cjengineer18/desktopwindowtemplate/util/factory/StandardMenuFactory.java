@@ -19,14 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.util.factory;
+package com.github.cjengineer18.desktopwindowtemplate.util.factory;
 
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import com.github.cjengineer18.desktop.window.template.exception.InvalidParameterException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
 
 /**
  * Factory for menus, either for a menu bar or for a sub-menu.

@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.util.factory;
+package com.github.cjengineer18.desktopwindowtemplate.util.factory;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -30,9 +30,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import com.github.cjengineer18.desktop.window.template.component.JStatusBar;
-import com.github.cjengineer18.desktop.window.template.exception.InvalidParameterException;
-import com.github.cjengineer18.desktop.window.template.exception.UnavailableComponentException;
+import com.github.cjengineer18.desktopwindowtemplate.component.JStatusBar;
+import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import com.github.cjengineer18.desktopwindowtemplate.exception.UnavailableComponentException;
 
 /**
  * Factory for create predefined status bars.

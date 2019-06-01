@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.util.factory;
+package com.github.cjengineer18.desktopwindowtemplate.util.factory;
 
 import java.awt.Window;
 

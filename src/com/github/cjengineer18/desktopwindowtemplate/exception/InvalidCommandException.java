@@ -19,24 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.exception;
+package com.github.cjengineer18.desktopwindowtemplate.exception;
 
-public class UnavailableComponentException extends Exception {
+public class InvalidCommandException extends Exception {
 
-	private static final long serialVersionUID = 14L;
+	private static final long serialVersionUID = 0x1234L;
 
-	public UnavailableComponentException(Object error, Throwable exc) {
-		super("Unavailable Component" + error.toString(), exc);
+	public InvalidCommandException() {
+		super("Invalid Command or Error in Command");
 	}
 
-	public UnavailableComponentException(Throwable exc) {
-		super("Unavailable Component", exc);
+	public InvalidCommandException(int invalidIndex) {
+		super("Invalid Window Command" + invalidIndex);
+	}
+
+	public InvalidCommandException(int invalidIndex, Throwable consecuence) {
+		super("Invalid Window Command" + invalidIndex, consecuence);
 	}
 
 	@Override
 	public String getMessage() {
 		// TODO Auto-generated method stub
-		return "Unavailable Component";
+		return "Invalid Command or Error in Command!";
 	}
 
 }

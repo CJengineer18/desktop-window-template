@@ -19,28 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktop.window.template.exception;
+package com.github.cjengineer18.desktopwindowtemplate.exception;
 
-public class InvalidCommandException extends Exception {
+public class InvalidParameterException extends Exception {
 
-	private static final long serialVersionUID = 0x1234L;
+	private static final long serialVersionUID = 0xABCDL;
 
-	public InvalidCommandException() {
-		super("Invalid Command or Error in Command");
+	public InvalidParameterException(Exception exc) {
+		super("Invalid Parameter", exc);
 	}
 
-	public InvalidCommandException(int invalidIndex) {
-		super("Invalid Window Command" + invalidIndex);
-	}
-
-	public InvalidCommandException(int invalidIndex, Throwable consecuence) {
-		super("Invalid Window Command" + invalidIndex, consecuence);
+	public InvalidParameterException(String error) {
+		super("Invalid Parameter" + error);
 	}
 
 	@Override
 	public String getMessage() {
 		// TODO Auto-generated method stub
-		return "Invalid Command or Error in Command!";
+		return "Invalid Parameter!";
 	}
 
 }
