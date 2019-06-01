@@ -1,5 +1,5 @@
-com.github.cjengineer18.desktop.window.template
-com.github.cjengineer18.desktop.window.template.component
-com.github.cjengineer18.desktop.window.template.exception
-com.github.cjengineer18.desktop.window.template.util.async
-com.github.cjengineer18.desktop.window.template.util.factory
+com.github.cjengineer18.desktopwindowtemplate
+com.github.cjengineer18.desktopwindowtemplate.component
+com.github.cjengineer18.desktopwindowtemplate.exception
+com.github.cjengineer18.desktopwindowtemplate.util.async
+com.github.cjengineer18.desktopwindowtemplate.util.factory
