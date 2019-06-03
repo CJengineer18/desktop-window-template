@@ -27,17 +27,16 @@ import java.util.ResourceBundle;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-import com.github.cjengineer18.desktopwindowtemplate.component.WaitingPanel;
+import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
+import com.github.cjengineer18.desktopwindowtemplate.resources.constants.BundleConstants;
 import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
 /**
- * An utility method for async process (no return).
+ * An utility method for async process (no return, no progress monitoring).
  * 
  * @author Cristian Jimenez
  */
 public abstract class AsyncProcessLoading {
-
-	private static final String BUNDLE_LOCALE = "com.github.cjengineer18.desktopwindowtemplate.resources.bundle.loading";
 
 	/**
 	 * Load asynchronously a process. A loading dialog will appear.
@@ -48,7 +47,7 @@ public abstract class AsyncProcessLoading {
 	 *            The process.
 	 */
 	public static void loadAsyncProcess(Window parent, Runnable run) {
-		ResourceBundle b = ResourceBundle.getBundle(BUNDLE_LOCALE);
+		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 		loadAsyncProcess(parent, run, b.getString("loadingTitle"), b.getString("loadingMessage"));
 	}
 
@@ -63,7 +62,7 @@ public abstract class AsyncProcessLoading {
 	 *            A text that will appear in the loading dialog.
 	 */
 	public static void loadAsyncProcess(Window parent, Runnable run, String text) {
-		ResourceBundle b = ResourceBundle.getBundle(BUNDLE_LOCALE);
+		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 		loadAsyncProcess(parent, run, b.getString("loadingTitle"), text);
 	}
 
@@ -95,7 +94,6 @@ public abstract class AsyncProcessLoading {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				while (thread.isAlive())
 					;
 				d.dispose();

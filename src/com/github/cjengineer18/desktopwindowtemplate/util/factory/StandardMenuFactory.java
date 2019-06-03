@@ -145,6 +145,7 @@ public class StandardMenuFactory {
 		}
 	}
 
+	// Tests the content.
 	private static boolean testContent(Object obj) {
 		return (!((obj instanceof JMenu) || obj.toString().equals(SEPARATOR)));
 	}

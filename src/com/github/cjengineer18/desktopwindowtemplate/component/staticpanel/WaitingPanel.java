@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2019 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,23 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktopwindowtemplate.exception;
+package com.github.cjengineer18.desktopwindowtemplate.component.staticpanel;
 
-public class UnavailableComponentException extends Exception {
+import java.awt.BorderLayout;
 
-	private static final long serialVersionUID = 14L;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 
-	public UnavailableComponentException(Object error, Throwable exc) {
-		super("Unavailable Component" + error.toString(), exc);
+/**
+ * A waiting panel.
+ * 
+ * @see com.github.cjengineer18.desktopwindowtemplate.util.async.AsyncProcessLoading
+ * 
+ * @author Cristian Jimenez
+ */
+public class WaitingPanel extends JPanel {
+
+	private static final long serialVersionUID = 40L;
+
+	private String message;
+
+	public WaitingPanel(String message) {
+		super(new BorderLayout());
+		this.message = message;
+		createNewInstance();
 	}
 
-	public UnavailableComponentException(Throwable exc) {
-		super("Unavailable Component", exc);
-	}
-
-	@Override
-	public String getMessage() {
-		return "Unavailable Component";
+	private void createNewInstance() {
+		add(BorderLayout.CENTER, new JLabel(message));
+		JProgressBar bar = new JProgressBar();
+		bar.setIndeterminate(true);
+		add(BorderLayout.SOUTH, bar);
 	}
 
 }

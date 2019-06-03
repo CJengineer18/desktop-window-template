@@ -39,7 +39,6 @@ public class InvalidCommandException extends Exception {
 
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
 		return "Invalid Command or Error in Command!";
 	}
 

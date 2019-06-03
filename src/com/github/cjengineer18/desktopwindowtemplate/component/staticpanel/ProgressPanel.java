@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktopwindowtemplate.component;
+package com.github.cjengineer18.desktopwindowtemplate.component.staticpanel;
 
 import java.awt.BorderLayout;
 
@@ -28,29 +28,46 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 /**
- * A waiting panel.
+ * A progress panel.
  * 
- * @see com.github.cjengineer18.desktopwindowtemplate.util.async.AsyncProcessLoading
+ * @see com.github.cjengineer18.desktopwindowtemplate.util.async.AsyncTask
  * 
  * @author Cristian Jimenez
  */
-public class WaitingPanel extends JPanel {
+public class ProgressPanel extends JPanel {
 
-	private static final long serialVersionUID = 40L;
+	private static final long serialVersionUID = 42L;
 
-	private String message;
+	private JLabel message;
+	private JProgressBar bar;
 
-	public WaitingPanel(String message) {
+	public ProgressPanel(String message) {
 		super(new BorderLayout());
-		this.message = message;
+		this.message = new JLabel(message);
 		createNewInstance();
 	}
 
+	public void setMessage(String newMessage) {
+		message.setText(newMessage);
+	}
+
+	public void setProgress(int progress) {
+		bar.setValue(progress);
+	}
+
+	public void grow(int delta) {
+		bar.setValue(bar.getValue() + delta);
+	}
+
+	public void restart() {
+		bar.setValue(0);
+	}
+
 	private void createNewInstance() {
-		// TODO Auto-generated method stub
-		add(BorderLayout.CENTER, new JLabel(message));
-		JProgressBar bar = new JProgressBar();
-		bar.setIndeterminate(true);
+		add(BorderLayout.CENTER, message);
+		bar = new JProgressBar();
+		bar.setValue(0);
+		bar.setStringPainted(true);
 		add(BorderLayout.SOUTH, bar);
 	}
 

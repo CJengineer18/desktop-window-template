@@ -44,9 +44,10 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
 /**
  * Generic window for any desktop application.
  * 
- * @version v1.0.2
+ * @version v1.1
  * 
  * @author Cristian Jimenez
+ * 
  */
 public abstract class JGenericWindow extends JFrame implements Serializable {
 
@@ -349,7 +350,6 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					try {
 						workArea();
 						pack();
@@ -437,7 +437,6 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				if (!listeners1.isEmpty()) {
 					for (WindowListener wl : listeners1)
 						addWindowListener(wl);
