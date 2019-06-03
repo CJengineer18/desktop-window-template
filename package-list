@@ -1,5 +1,7 @@
 com.github.cjengineer18.desktopwindowtemplate
 com.github.cjengineer18.desktopwindowtemplate.component
+com.github.cjengineer18.desktopwindowtemplate.component.staticpanel
 com.github.cjengineer18.desktopwindowtemplate.exception
+com.github.cjengineer18.desktopwindowtemplate.resources.constants
 com.github.cjengineer18.desktopwindowtemplate.util.async
 com.github.cjengineer18.desktopwindowtemplate.util.factory
