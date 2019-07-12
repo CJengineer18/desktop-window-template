@@ -17,4 +17,6 @@ From version v1.0.2, you can now process asynchronous processes and tasks using 
 
 Documentation: https://cjengineer18.github.io/DesktopWindowTemplate/
 
-Licence: MIT
+## License
+
+MIT
