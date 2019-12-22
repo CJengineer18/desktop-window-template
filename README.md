@@ -15,7 +15,7 @@ From version v1.0.2, you can now process asynchronous processes and tasks using 
 - 29-03-2019: Reduce minimum size (640x480 -> 200x200)
 - 05-11-2018: First public version (v1.1-alpha) 
 
-Documentation: https://cjengineer18.github.io/DesktopWindowTemplate/
+Documentation: https://cjengineer18.github.io/desktop-window-template/
 
 ## License
 
