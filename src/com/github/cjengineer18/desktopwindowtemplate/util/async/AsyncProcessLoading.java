@@ -94,8 +94,7 @@ public abstract class AsyncProcessLoading {
 
 			@Override
 			public void run() {
-				while (thread.isAlive())
-					;
+				while (thread.isAlive());
 				d.dispose();
 			}
 

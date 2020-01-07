@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2019-2020 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,11 @@ import java.util.concurrent.TimeoutException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.ProgressPanel;
+import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
 import com.github.cjengineer18.desktopwindowtemplate.resources.constants.BundleConstants;
 import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
@@ -56,11 +58,26 @@ public abstract class AsyncTask<Input, Output> {
 	private Window parent;
 	private JDialog dialog;
 	private AsyncWorker worker;
-	private ProgressPanel panel;
+	private JPanel panel;
 	private Output result;
 	private String title;
 	private boolean enableCancel;
+	private boolean indeterminate;
 	private int step;
+
+	/**
+	 * Creates a new async task. With this constructor you can create
+	 * indeterminate progress task. Note what this version of AsyncTask still be
+	 * return something, otherwise you must use {@code AsyncProcessLoading}.
+	 * 
+	 * @param parent
+	 *            A window parent. If {@code null}, a default frame is used.
+	 * 
+	 * @see AsyncProcessLoading
+	 */
+	public AsyncTask(Window parent) {
+		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingTitle"), 0, true, true);
+	}
 
 	/**
 	 * Creates a new async task.
@@ -71,7 +88,8 @@ public abstract class AsyncTask<Input, Output> {
 	 *            The progress step.
 	 */
 	public AsyncTask(Window parent, int step) {
-		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, true);
+		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, false,
+				true);
 	}
 
 	/**
@@ -83,14 +101,17 @@ public abstract class AsyncTask<Input, Output> {
 	 *            A title for the dialog title.
 	 * @param step
 	 *            The progress step.
+	 * @param indeterminate
+	 *            If {@code true}, disables progress monitoring.
 	 * @param enableCancel
 	 *            If this process can be cancelled.
 	 */
-	public AsyncTask(Window parent, String title, int step, boolean enableCancel) {
+	public AsyncTask(Window parent, String title, int step, boolean indeterminate, boolean enableCancel) {
 		this.parent = parent;
 		this.step = step;
 		this.title = title;
 		this.enableCancel = enableCancel;
+		this.indeterminate = indeterminate;
 	}
 
 	/**
@@ -104,9 +125,11 @@ public abstract class AsyncTask<Input, Output> {
 	 */
 	@SafeVarargs
 	public final void execute(Input... inputs) {
-		JButton cancelButton = new JButton("Cancel");
+		JButton cancelButton = new JButton("Cancel"); //FIXME: Locale
 		worker = new AsyncWorker(this, inputs);
-		panel = new ProgressPanel(new String());
+		panel = indeterminate
+				? new WaitingPanel(ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingMessage"))
+				: new ProgressPanel(new String());
 		dialog = DialogMaker.makeDialog(parent, title, panel, enableCancel ? new JButton[] { cancelButton } : null);
 
 		cancelButton.addActionListener(new ActionListener() {
@@ -124,7 +147,8 @@ public abstract class AsyncTask<Input, Output> {
 	/**
 	 * Calls the {@code SwingWorker.get()} to get the result of the process, or
 	 * return it immediately if this task has been executed successfully. Return
-	 * {@code null} if the task has cancelled.
+	 * {@code null} if the task has cancelled. You must call {@code execute()}
+	 * before call this.
 	 * 
 	 * @return The task's result.
 	 * 
@@ -132,6 +156,7 @@ public abstract class AsyncTask<Input, Output> {
 	 * @throws ExecutionException
 	 * 
 	 * @see SwingWorker#get()
+	 * @see #execute(Object...)
 	 */
 	public final Output get() throws InterruptedException, ExecutionException {
 		if (!worker.isDone()) {
@@ -144,7 +169,8 @@ public abstract class AsyncTask<Input, Output> {
 	/**
 	 * Calls the {@code SwingWorker.get(long, TimeUnit)} to get the result of
 	 * the process, or return it immediately if this task has been executed
-	 * successfully. Return {@code null} if the task has cancelled.
+	 * successfully. Return {@code null} if the task has cancelled. You must
+	 * call {@code execute()} before call this.
 	 * 
 	 * @param timeout
 	 *            The time to wait.
@@ -158,6 +184,7 @@ public abstract class AsyncTask<Input, Output> {
 	 * @throws TimeoutException
 	 * 
 	 * @see SwingWorker#get(long, TimeUnit)
+	 * @see #execute(Object...)
 	 */
 	public final Output get(long timeout, TimeUnit unit)
 			throws InterruptedException, ExecutionException, TimeoutException {
@@ -174,7 +201,7 @@ public abstract class AsyncTask<Input, Output> {
 	 * @return {@code true} if the task is done.
 	 */
 	public final boolean isDone() {
-		return worker.isDone();
+		return (worker == null) ? false : worker.isDone();
 	}
 
 	/**
@@ -183,7 +210,7 @@ public abstract class AsyncTask<Input, Output> {
 	 * @return {@code true} if the task is cancelled.
 	 */
 	public final boolean isCancelled() {
-		return worker.isCancelled();
+		return (worker == null) ? false : worker.isCancelled();
 	}
 
 	/**
@@ -200,7 +227,9 @@ public abstract class AsyncTask<Input, Output> {
 	 *            The progress change.
 	 */
 	protected final void addDelta(int delta) {
-		panel.grow(delta);
+		if (!indeterminate) {
+			((ProgressPanel) panel).grow(delta);
+		}
 	}
 
 	/**
@@ -210,7 +239,9 @@ public abstract class AsyncTask<Input, Output> {
 	 *            The new message.
 	 */
 	protected final void updateMessage(String message) {
-		panel.setMessage(message);
+		if (!indeterminate) {
+			((ProgressPanel) panel).setMessage(message);
+		}
 	}
 
 	/**
@@ -222,8 +253,7 @@ public abstract class AsyncTask<Input, Output> {
 	 * 
 	 * @see #doInBackground(Object[])
 	 */
-	protected void done(Output output) {
-	};
+	protected void done(Output output) {};
 
 	/**
 	 * The task to execute in an async thread. Returns a result or throws an
