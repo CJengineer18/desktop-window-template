@@ -9,9 +9,9 @@ You only create a new class and extend for ```JGenericWindow``` class. In the co
 ## Asynchronous utilities
 From version v1.0.2, you can now process asynchronous processes and tasks using the ```AsyncProcessLoading``` and ```AsyncTask``` utility classes. See the documentation for more info.
 
-## Changes
+## Changelog
 - 08-01-2020: Added buttons default locale text
-- 07-01-2020: Fixed worker null in AsyncTask.java
+- 07-01-2020: Added indeterminate mode, fixed worker null in AsyncTask.java
 - 03-06-2019: Added async task utility class.
 - 25-05-2019: Added async process utility class.
 - 29-03-2019: Reduce minimum size (640x480 -> 200x200)
