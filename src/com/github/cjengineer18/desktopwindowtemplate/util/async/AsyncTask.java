@@ -125,11 +125,11 @@ public abstract class AsyncTask<Input, Output> {
 	 */
 	@SafeVarargs
 	public final void execute(Input... inputs) {
-		JButton cancelButton = new JButton("Cancel"); //FIXME: Locale
+		ResourceBundle buttons = ResourceBundle.getBundle(BundleConstants.BUTTONS_LOCALE);
+		ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+		JButton cancelButton = new JButton(buttons.getString("cancelButton"));
 		worker = new AsyncWorker(this, inputs);
-		panel = indeterminate
-				? new WaitingPanel(ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingMessage"))
-				: new ProgressPanel(new String());
+		panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage")) : new ProgressPanel(new String());
 		dialog = DialogMaker.makeDialog(parent, title, panel, enableCancel ? new JButton[] { cancelButton } : null);
 
 		cancelButton.addActionListener(new ActionListener() {
