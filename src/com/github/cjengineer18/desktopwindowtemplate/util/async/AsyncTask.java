@@ -114,6 +114,8 @@ public abstract class AsyncTask<Input, Output> {
 		this.indeterminate = indeterminate;
 	}
 
+	// Public functions
+
 	/**
 	 * Executes the process, passing the arguments if required. Unlike
 	 * {@code SwingWorker.execute()}, this method can be used many times.
@@ -213,6 +215,17 @@ public abstract class AsyncTask<Input, Output> {
 		return (worker == null) ? false : worker.isCancelled();
 	}
 
+	// Protected functions
+
+	/**
+	 * Get the window parent
+	 * 
+	 * @return The parent.
+	 */
+	protected final Window getParent() {
+		return parent;
+	}
+
 	/**
 	 * Adds the step as progress.
 	 */
@@ -253,7 +266,9 @@ public abstract class AsyncTask<Input, Output> {
 	 * 
 	 * @see #doInBackground(Object[])
 	 */
-	protected void done(Output output) {};
+	protected void done(Output output) {
+		// empty
+	};
 
 	/**
 	 * The task to execute in an async thread. Returns a result or throws an
@@ -273,6 +288,8 @@ public abstract class AsyncTask<Input, Output> {
 	 * @see #done(Object)
 	 */
 	protected abstract Output doInBackground(Input[] inputs) throws Exception;
+
+	// Private functions
 
 	/*
 	 * Closes the dialog and save the result before invoke done(Output).
@@ -302,6 +319,7 @@ public abstract class AsyncTask<Input, Output> {
 		@Override
 		protected Output doInBackground() throws Exception {
 			result = task.doInBackground(inputs);
+
 			return result;
 		}
 

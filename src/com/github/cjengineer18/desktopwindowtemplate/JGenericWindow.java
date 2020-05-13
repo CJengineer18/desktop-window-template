@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2020 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
 /**
  * Generic window for any desktop application.
  * 
- * @version v1.1
+ * @version v1.1.0.2
  * 
  * @author Cristian Jimenez
  * 
@@ -171,6 +171,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 *             If any index is invalid.
 	 */
 	public void singleSetterV(int v, int index, Object newObject) throws InvalidCommandException {
+		// empty
 	}
 
 	/**
@@ -202,6 +203,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 *             If the index is invalid (the array doesn't exists).
 	 */
 	public void vectorSetter(int v, Object[] newVector) throws InvalidCommandException {
+		// empty
 	}
 
 	/**
@@ -216,6 +218,22 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
 	protected void beforeLoadArea() throws Exception {
+		// empty
+	}
+
+	/**
+	 * This method does any necessary action before create and show the window.
+	 * This method is invoked from
+	 * {@code loadWorkArea(String, int, int, boolean, int)}. By default, this
+	 * method does nothing, but can be override.
+	 * 
+	 * @throws Exception
+	 *             If any error.
+	 * 
+	 * @see #loadWorkArea(String, int, int, boolean, int)
+	 */
+	protected void afterLoadArea() throws Exception {
+		// empty
 	}
 
 	// Common methods
@@ -311,23 +329,30 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void loadWorkArea(String title, int width, int height, boolean fixedWindow, int typeClosingWindow)
 			throws Exception {
+		Dimension screen;
+		JFrame dummy;
+		Insets windowInsets;
+		int x;
+		int y;
+
 		if (((width >= minimumSize.getWidth()) && (height >= minimumSize.getHeight())) && (title != null)) {
-			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			screen = Toolkit.getDefaultToolkit().getScreenSize();
 			setTitle(title);
 			originalSize = new Dimension(width, height);
-			JFrame dummy = new JFrame();
+			dummy = new JFrame();
 			dummy.setLayout(null);
 			dummy.pack();
-			Insets windowInsets = (Insets) dummy.getInsets().clone();
+			windowInsets = (Insets) dummy.getInsets().clone();
 			realSize = createWorkArea(originalSize, windowInsets);
 			setSize(realSize);
 			setPreferredSize(realSize);
-			int x = (int) ((screen.getWidth() / 2) - (realSize.getWidth() / 2));
-			int y = (int) ((screen.getHeight() / 2) - (realSize.getHeight() / 2));
+			x = (int) ((screen.getWidth() / 2) - (realSize.getWidth() / 2));
+			y = (int) ((screen.getHeight() / 2) - (realSize.getHeight() / 2));
 			setLocation(x, y);
 			setResizable(!fixedWindow);
 			tolerableMinimumSize(windowInsets);
 			beforeLoadArea();
+
 			switch (typeClosingWindow) {
 			// NO_CONFIRM_AT_CLOSE
 			case 0:
@@ -346,6 +371,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 				throw new InvalidParameterException(
 						String.format(Locale.ENGLISH, "typeClosingWindow = %d?", typeClosingWindow));
 			}
+
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
@@ -354,6 +380,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 						workArea();
 						pack();
 						setVisible(true);
+						executeAfterLoadArea();
 					} catch (Exception exc) {
 						Logger.getLogger(JGenericWindow.class.getName()).log(Level.SEVERE, exc.getMessage(), exc);
 					}
@@ -361,11 +388,12 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 			});
 		} else {
-			if ((width <= 0) || (height <= 0))
+			if ((width <= 0) || (height <= 0)) {
 				throw new InvalidParameterException(
 						String.format(Locale.ENGLISH, "Wrong size => (width = %d, height = %d)", width, height));
-			else if (title == null)
+			} else if (title == null) {
 				throw new InvalidParameterException(new NullPointerException("title"));
+			}
 		}
 	}
 
@@ -384,17 +412,19 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		if (listeners != null) {
 			if (listeners.length > 0) {
 				for (WindowListener wl : listeners) {
-					if (wl != null)
+					if (wl != null) {
 						listeners1.add(wl);
-					else {
+					} else {
 						Logger.getLogger(JGenericWindow.class.getName()).log(Level.WARNING,
 								"A listener is null. Ignoring...");
 					}
 				}
-			} else
+			} else {
 				throw new InvalidParameterException("No listeners to add!");
-		} else
+			}
+		} else {
 			throw new InvalidParameterException(new NullPointerException());
+		}
 	}
 
 	/**
@@ -412,17 +442,19 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		if (listeners != null) {
 			if (listeners.length != 0) {
 				for (WindowStateListener wsl : listeners) {
-					if (wsl != null)
+					if (wsl != null) {
 						listeners2.add(wsl);
-					else {
+					} else {
 						Logger.getLogger(JGenericWindow.class.getName()).log(Level.WARNING,
 								"An listener is null. Ignoring...");
 					}
 				}
-			} else
+			} else {
 				throw new InvalidParameterException("No listeners to add!");
-		} else
+			}
+		} else {
 			throw new InvalidParameterException(new NullPointerException());
+		}
 	}
 
 	/**
@@ -438,12 +470,15 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			@Override
 			public void run() {
 				if (!listeners1.isEmpty()) {
-					for (WindowListener wl : listeners1)
+					for (WindowListener wl : listeners1) {
 						addWindowListener(wl);
+					}
 				}
+
 				if (!listeners2.isEmpty()) {
-					for (WindowStateListener wsl : listeners2)
+					for (WindowStateListener wsl : listeners2) {
 						addWindowStateListener(wsl);
+					}
 				}
 			}
 
@@ -461,16 +496,23 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final boolean insertMainMenuBar(JMenu... menus) {
 		boolean success = true;
+
 		if ((menus != null) && (menus.length > 0)) {
 			JMenuBar jmb = new JMenuBar();
+
 			for (JMenu jm : menus) {
-				if (jm != null)
+				if (jm != null) {
 					jmb.add(jm);
+				}
 			}
-			if (success)
+
+			if (success) {
 				setJMenuBar(jmb);
-		} else
+			}
+		} else {
 			success = false;
+		}
+
 		return success;
 	}
 
@@ -504,6 +546,9 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		int[] insetValues = new int[2];
 		String os = System.getProperty("os.name");
 
+		int realWidth;
+		int realHeight;
+
 		// FIXME Some OS restrict the actual workspace to assign them to the
 		// FIXME border and the title bar.
 		// FIXME Depending on the OS, we compensate for the missing part by
@@ -523,9 +568,15 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 		// FIXME Untested on Mac (OSX)
 
-		int realWidth = ((int) originalSize.getWidth()) + insetValues[1];
-		int realHeight = ((int) originalSize.getHeight()) + insetValues[0];
+		realWidth = ((int) originalSize.getWidth()) + insetValues[1];
+		realHeight = ((int) originalSize.getHeight()) + insetValues[0];
+
 		return new Dimension(realWidth, realHeight);
+	}
+
+	private void executeAfterLoadArea() throws Exception {
+		afterLoadArea();
+		restore();
 	}
 
 }
