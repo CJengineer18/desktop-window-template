@@ -21,6 +21,15 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.exception;
 
+/**
+ * This exception is thrown when an {@link Exception} is thrown during an async
+ * process. However, the cause of the exception is unknown.
+ * 
+ * @see AsyncProcessException
+ * 
+ * @author Cristian Jimenez Dzg
+ *
+ */
 public class UnknownAsyncProcessException extends Exception {
 
 	private static final long serialVersionUID = -4586763719006993165L;
@@ -31,7 +40,6 @@ public class UnknownAsyncProcessException extends Exception {
 
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
 		return "An unknown error was thrown during the process";
 	}
 

@@ -47,41 +47,21 @@ public abstract class AsyncProcessLoading {
 	 * 
 	 * @param parent
 	 *            A window parent. If {@code null}, a default frame is used.
-	 * @param run
-	 *            The process. If the process is a {@link Thread} subclass, you
-	 *            must implement it's own {@link UncaughtExceptionHandler}.
-	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
-	 *            implemented in a new {@link Thread} object.
+	 * @param runnable
+	 *            The process. If the process is a {@code Thread} subclass, you
+	 *            must implement it's own {@code UncaughtExceptionHandler}.
+	 *            Otherwise a default {@code UncaughtExceptionHandler} will be
+	 *            implemented in a new {@code Thread} object.
 	 * 
 	 * @throws AsyncProcessException
 	 *             If an {@link Exception} is thrown during the async process.
-	 */
-	public static void loadAsyncProcess(Window parent, Runnable run) throws AsyncProcessException {
-		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
-
-		loadAsyncProcess(parent, run, b.getString("loadingTitle"), b.getString("loadingMessage"));
-	}
-
-	/**
-	 * Load asynchronously a process. A loading dialog will appear.
 	 * 
-	 * @param parent
-	 *            A window parent. If {@code null}, a default frame is used.
-	 * @param run
-	 *            The process. If the process is a {@link Thread} subclass, you
-	 *            must implement it's own {@link UncaughtExceptionHandler}.
-	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
-	 *            implemented in a new {@link Thread} object.
-	 * @param text
-	 *            A text that will appear in the loading dialog.
-	 * 
-	 * @throws AsyncProcessException
-	 *             If an {@link Exception} is thrown during the async process.
+	 * @see UncaughtExceptionHandler
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable run, String text) throws AsyncProcessException {
-		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+	public static void loadAsyncProcess(Window parent, Runnable runnable) throws AsyncProcessException {
+		ResourceBundle bundle = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 
-		loadAsyncProcess(parent, run, b.getString("loadingTitle"), text);
+		loadAsyncProcess(parent, runnable, bundle.getString("loadingTitle"), bundle.getString("loadingMessage"));
 	}
 
 	/**
@@ -90,21 +70,47 @@ public abstract class AsyncProcessLoading {
 	 * @param parent
 	 *            A window parent. If {@code null}, a default frame is used.
 	 * @param runnable
-	 *            The process. If the process is a {@link Thread} subclass, you
-	 *            must implement it's own {@link UncaughtExceptionHandler}.
-	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
-	 *            implemented in a new {@link Thread} object.
-	 * @param title
-	 *            A title for the dialog.
-	 * @param text
-	 *            A text that will appear in the loading dialog.
+	 *            The process. If the process is a {@code Thread} subclass, you
+	 *            must implement it's own {@code UncaughtExceptionHandler}.
+	 *            Otherwise a default {@code UncaughtExceptionHandler} will be
+	 *            implemented in a new {@code Thread} object.
+	 * @param message
+	 *            A message that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException
 	 *             If an {@link Exception} is thrown during the async process.
+	 * 
+	 * @see UncaughtExceptionHandler
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable runnable, String title, String text)
+	public static void loadAsyncProcess(Window parent, Runnable runnable, String message) throws AsyncProcessException {
+		ResourceBundle bundle = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+
+		loadAsyncProcess(parent, runnable, bundle.getString("loadingTitle"), message);
+	}
+
+	/**
+	 * Load asynchronously a process. A loading dialog will appear.
+	 * 
+	 * @param parent
+	 *            A window parent. If {@code null}, a default frame is used.
+	 * @param runnable
+	 *            The process. If the process is a {@code Thread} subclass, you
+	 *            must implement it's own {@code UncaughtExceptionHandler}.
+	 *            Otherwise a default {@code UncaughtExceptionHandler} will be
+	 *            implemented in a new {@code Thread} object.
+	 * @param title
+	 *            A title for the dialog.
+	 * @param message
+	 *            A message that will appear in the loading dialog.
+	 * 
+	 * @throws AsyncProcessException
+	 *             If an {@link Exception} is thrown during the async process.
+	 * 
+	 * @see UncaughtExceptionHandler
+	 */
+	public static void loadAsyncProcess(Window parent, Runnable runnable, String title, String message)
 			throws AsyncProcessException {
-		JDialog dialog = DialogMaker.makeDialog(parent, title, new WaitingPanel(text), null);
+		JDialog dialog = DialogMaker.makeDialog(parent, title, new WaitingPanel(message), null);
 		AtomicReference<Throwable> threadException = new AtomicReference<Throwable>();
 
 		Thread thread;

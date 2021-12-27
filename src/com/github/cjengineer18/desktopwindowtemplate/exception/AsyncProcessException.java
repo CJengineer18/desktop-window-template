@@ -21,20 +21,30 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.exception;
 
+import com.github.cjengineer18.desktopwindowtemplate.util.async.AsyncProcessLoading;
+
+/**
+ * This exception is thrown when an {@link Exception} was thrown during an async
+ * process.
+ * 
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable)
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable, String)
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable, String,
+ *      String)
+ * 
+ * @author Cristian Jimenez Dzg
+ *
+ */
 public class AsyncProcessException extends Exception {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8402899429558462504L;
 
 	public AsyncProcessException(Throwable throwable) {
-		super("An error was thrown in an async process", throwable);
+		super(String.format("An error was thrown in an async process: %s", throwable.getMessage()), throwable);
 	}
 
 	@Override
 	public String getMessage() {
-		// TODO Auto-generated method stub
 		return "An error was thrown in an async process";
 	}
 

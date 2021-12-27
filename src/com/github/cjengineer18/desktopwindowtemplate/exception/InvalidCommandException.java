@@ -21,6 +21,18 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.exception;
 
+import com.github.cjengineer18.desktopwindowtemplate.JGenericWindow;
+
+/**
+ * This exception is thrown when an invalid command parameter was passed.
+ * 
+ * @see JGenericWindow#singleSetter(int, Object)
+ * @see JGenericWindow#singleSetterV(int, int, Object)
+ * @see JGenericWindow#vectorSetter(int, Object[])
+ * 
+ * @author Cristian Jimenez Dzg
+ *
+ */
 public class InvalidCommandException extends Exception {
 
 	private static final long serialVersionUID = 0x1234L;

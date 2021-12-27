@@ -21,6 +21,17 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.exception;
 
+import com.github.cjengineer18.desktopwindowtemplate.component.JStatusBar;
+
+/**
+ * This exception is thrown when a component is unavailable.
+ * 
+ * @see JStatusBar#getContentSection()
+ * @see JStatusBar#extractLastPanel()
+ * 
+ * @author Cristian Jimenez Dzg
+ *
+ */
 public class UnavailableComponentException extends Exception {
 
 	private static final long serialVersionUID = 14L;

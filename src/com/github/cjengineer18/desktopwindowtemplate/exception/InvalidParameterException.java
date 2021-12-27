@@ -21,6 +21,16 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.exception;
 
+import com.github.cjengineer18.desktopwindowtemplate.JGenericWindow;
+
+/**
+ * This exception is thrown when an invalid parameter was send.
+ * 
+ * @see JGenericWindow
+ * 
+ * @author Cristian Jimenez Dzg
+ *
+ */
 public class InvalidParameterException extends Exception {
 
 	private static final long serialVersionUID = 0xABCDL;
