@@ -43,9 +43,4 @@ public class AsyncProcessException extends Exception {
 		super(String.format("An error was thrown in an async process: %s", throwable.getMessage()), throwable);
 	}
 
-	@Override
-	public String getMessage() {
-		return "An error was thrown in an async process";
-	}
-
 }
