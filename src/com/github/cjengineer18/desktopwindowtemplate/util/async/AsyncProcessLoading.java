@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
@@ -49,13 +48,17 @@ public abstract class AsyncProcessLoading {
 	 * @param parent
 	 *            A window parent. If {@code null}, a default frame is used.
 	 * @param run
-	 *            The process.
+	 *            The process. If the process is a {@link Thread} subclass, you
+	 *            must implement it's own {@link UncaughtExceptionHandler}.
+	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
+	 *            implemented in a new {@link Thread} object.
 	 * 
 	 * @throws AsyncProcessException
-	 *             If an Exception is thrown during the thread process.
+	 *             If an {@link Exception} is thrown during the async process.
 	 */
 	public static void loadAsyncProcess(Window parent, Runnable run) throws AsyncProcessException {
 		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+
 		loadAsyncProcess(parent, run, b.getString("loadingTitle"), b.getString("loadingMessage"));
 	}
 
@@ -65,15 +68,19 @@ public abstract class AsyncProcessLoading {
 	 * @param parent
 	 *            A window parent. If {@code null}, a default frame is used.
 	 * @param run
-	 *            The process.
+	 *            The process. If the process is a {@link Thread} subclass, you
+	 *            must implement it's own {@link UncaughtExceptionHandler}.
+	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
+	 *            implemented in a new {@link Thread} object.
 	 * @param text
 	 *            A text that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException
-	 *             If an Exception is thrown during the thread process.
+	 *             If an {@link Exception} is thrown during the async process.
 	 */
 	public static void loadAsyncProcess(Window parent, Runnable run, String text) throws AsyncProcessException {
 		ResourceBundle b = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+
 		loadAsyncProcess(parent, run, b.getString("loadingTitle"), text);
 	}
 
@@ -82,35 +89,36 @@ public abstract class AsyncProcessLoading {
 	 * 
 	 * @param parent
 	 *            A window parent. If {@code null}, a default frame is used.
-	 * @param run
-	 *            The process.
+	 * @param runnable
+	 *            The process. If the process is a {@link Thread} subclass, you
+	 *            must implement it's own {@link UncaughtExceptionHandler}.
+	 *            Otherwise a default {@link UncaughtExceptionHandler} will be
+	 *            implemented in a new {@link Thread} object.
 	 * @param title
-	 *            An title for the dialog.
+	 *            A title for the dialog.
 	 * @param text
 	 *            A text that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException
-	 *             If an Exception is thrown during the thread process.
+	 *             If an {@link Exception} is thrown during the async process.
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable run, String title, String text)
+	public static void loadAsyncProcess(Window parent, Runnable runnable, String title, String text)
 			throws AsyncProcessException {
-		JDialog d = DialogMaker.makeDialog(parent, title, new WaitingPanel(text), null);
+		JDialog dialog = DialogMaker.makeDialog(parent, title, new WaitingPanel(text), null);
 		AtomicReference<Throwable> threadException = new AtomicReference<Throwable>();
 
 		Thread thread;
 		Thread daemon;
 
-		if (run instanceof Thread) {
-			thread = (Thread) run;
+		if (runnable instanceof Thread) {
+			thread = (Thread) runnable;
 		} else {
-			thread = new Thread(run);
+			thread = new Thread(runnable);
+
 			thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 				@Override
 				public void uncaughtException(Thread thread, Throwable throwable) {
-					// TODO Auto-generated method stub
-					thread.interrupt();
-
 					if (throwable instanceof RuntimeException) {
 						if (throwable.getCause() != null) {
 							threadException.set(throwable.getCause());
@@ -120,11 +128,15 @@ public abstract class AsyncProcessLoading {
 					} else {
 						threadException.set(throwable);
 					}
+
+					thread.interrupt();
 				}
 
 			});
 		}
 
+		// This daemon thread checks if the main thread was finish and close the
+		// dialog when finished.
 		daemon = new Thread(new Runnable() {
 
 			@Override
@@ -133,22 +145,18 @@ public abstract class AsyncProcessLoading {
 					// Wait until main thread finish
 				}
 
-				if (threadException.get() != null) {
-					JOptionPane.showMessageDialog(parent, threadException.get().getMessage(), "Error in process",
-							JOptionPane.ERROR_MESSAGE);
-				}
-
-				d.dispose();
+				dialog.dispose();
 			}
 
 		});
 
 		daemon.setDaemon(true);
-		d.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		thread.start();
 		daemon.start();
-		d.setVisible(true);
+		dialog.setVisible(true);
 
+		// If an exception was thrown in the main thread, throw as a cause.
 		if (threadException.get() != null) {
 			throw new AsyncProcessException(threadException.get());
 		}
