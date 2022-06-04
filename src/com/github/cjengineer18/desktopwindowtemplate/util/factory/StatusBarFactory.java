@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,20 +39,23 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.UnavailableCompon
  * 
  * @author cjengineer18
  */
-public class StatusBarFactory {
+public abstract class StatusBarFactory {
 
 	/**
-	 * Create a status bar with the width, height, orientation and assigned content.
+	 * Create a status bar with the width, height, orientation and assigned
+	 * content.
 	 * 
 	 * @param width
 	 * @param height
-	 * @param rightToLeft {@code true} so that the order of the components is from
-	 *                    right to left.
+	 * @param rightToLeft
+	 *            {@code true} so that the order of the components is from right
+	 *            to left.
 	 * @param components
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException In case some parameter does not comply and
-	 *                                   / or some internal error.
+	 * @throws InvalidParameterException
+	 *             In case some parameter does not comply and / or some internal
+	 *             error.
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, int, Component...)
@@ -80,12 +83,14 @@ public class StatusBarFactory {
 	 * 
 	 * @param width
 	 * @param height
-	 * @param components .
+	 * @param components
+	 *            .
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException In case some parameter does not comply and
-	 *                                   / or some internal error.
+	 * @throws InvalidParameterException
+	 *             In case some parameter does not comply and / or some internal
+	 *             error.
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, boolean, Component...)
@@ -101,14 +106,16 @@ public class StatusBarFactory {
 	 * default height is 20px.
 	 * 
 	 * @param width
-	 * @param rightToLeft {@code true} so that the order of the components is from
-	 *                    right to left.
+	 * @param rightToLeft
+	 *            {@code true} so that the order of the components is from right
+	 *            to left.
 	 * @param components
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException In case some parameter does not comply and
-	 *                                   / or some internal error.
+	 * @throws InvalidParameterException
+	 *             In case some parameter does not comply and / or some internal
+	 *             error.
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, int, Component...)
@@ -120,16 +127,17 @@ public class StatusBarFactory {
 	}
 
 	/**
-	 * Create a status bar with the width and content assigned. The default height
-	 * is 20px. The orientation will be from left to right.
+	 * Create a status bar with the width and content assigned. The default
+	 * height is 20px. The orientation will be from left to right.
 	 * 
 	 * @param width
 	 * @param components
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException In case some parameter does not comply and
-	 *                                   / or some internal error.
+	 * @throws InvalidParameterException
+	 *             In case some parameter does not comply and / or some internal
+	 *             error.
 	 * 
 	 * @see #createStatusBar(int, int, Component...)
 	 * @see #createStatusBar(int, boolean, Component...)
@@ -140,14 +148,16 @@ public class StatusBarFactory {
 	}
 
 	/**
-	 * Create an empty status bar with the width and height assigned ready to use.
+	 * Create an empty status bar with the width and height assigned ready to
+	 * use.
 	 * 
 	 * @param width
 	 * @param height
 	 * 
 	 * @return A empty {@link JStatusBar}.
 	 * 
-	 * @throws InvalidParameterException In case of internal error.
+	 * @throws InvalidParameterException
+	 *             In case of internal error.
 	 * 
 	 * @see #createEmptyStatusBar(int)
 	 */
@@ -156,14 +166,15 @@ public class StatusBarFactory {
 	}
 
 	/**
-	 * Create an empty status bar with the assigned width ready to use. The default
-	 * height is 20px.
+	 * Create an empty status bar with the assigned width ready to use. The
+	 * default height is 20px.
 	 * 
 	 * @param width
 	 * 
 	 * @return A empty {@link JStatusBar}.
 	 * 
-	 * @throws InvalidParameterException In case of internal error.
+	 * @throws InvalidParameterException
+	 *             In case of internal error.
 	 * 
 	 * @see #createEmptyStatusBar(int, int)
 	 */
@@ -174,15 +185,17 @@ public class StatusBarFactory {
 	/**
 	 * Insert a component to the last panel of the status bar to modify.
 	 * 
-	 * @param statusBar Status bar to modify.
-	 * @param component The component to add.
+	 * @param statusBar
+	 *            Status bar to modify.
+	 * @param component
+	 *            The component to add.
 	 * 
 	 * @return The same status bar.
 	 * 
-	 * @throws InvalidParameterException In case {@code statusBar} or
-	 *                                   {@code component} are {@code null} or if
-	 *                                   the component to be modified is not
-	 *                                   available in the bar.
+	 * @throws InvalidParameterException
+	 *             In case {@code statusBar} or {@code component} are
+	 *             {@code null} or if the component to be modified is not
+	 *             available in the bar.
 	 */
 	public static JStatusBar insertComponentToLastPanel(JStatusBar statusBar, Component component)
 			throws InvalidParameterException {

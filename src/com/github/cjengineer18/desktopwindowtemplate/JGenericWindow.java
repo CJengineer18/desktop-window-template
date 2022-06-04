@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2020 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
 /**
  * Generic window for any desktop application.
  * 
- * @version v1.1.0.2
+ * @version v1.2
  * 
  * @author Cristian Jimenez
  * 
@@ -98,28 +98,28 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	// the application.
 
 	/**
-	 * Universal getter for any window's object.
+	 * Universal getter for any window property.
 	 * 
-	 * @param g
-	 *            Object index. If the index doesn't match any object, this
-	 *            method returns {@code null}.
+	 * @param objectIndex
+	 *            Object index. It must be a constant. If the index doesn't
+	 *            match any object, this method returns {@code null}.
 	 * 
-	 * @return The selected object.
+	 * @return The required object.
 	 */
-	public abstract Object singleGetter(int g);
+	public abstract Object singleGetter(int objectIndex);
 
 	/**
 	 * Universal setter for any window's object.
 	 * 
-	 * @param s
-	 *            Object index.
+	 * @param objectIndex
+	 *            Object index. It must be a constant.
 	 * @param newObject
 	 *            The new object to assign.
 	 * 
 	 * @throws InvalidCommandException
-	 *             If the index is invalid (object doesn's exists).
+	 *             If {@code objectIndex} doesn't match any valid index.
 	 */
-	public abstract void singleSetter(int s, Object newObject) throws InvalidCommandException;
+	public abstract void singleSetter(int objectIndex, Object newObject) throws InvalidCommandException;
 
 	/**
 	 * Here's all the window build. This method is invoked from
@@ -137,76 +137,6 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	// developer's choice override them.
 
 	/**
-	 * Universal getter for any object inside an array. This is the equivalent
-	 * to use {@code vectorGetter(v)[index]}. By default, returns {@code null},
-	 * but can be override.
-	 * 
-	 * @param v
-	 *            Array index. If the index doesn't match any array, this method
-	 *            returns {@code null}.
-	 * @param index
-	 *            Index of the object within the array. If the index doesn't
-	 *            match any object, this method returns {@code null}.
-	 * 
-	 * @return The selected object.
-	 * 
-	 * @see #vectorGetter(int)
-	 */
-	public Object singleGetterV(int v, int index) {
-		return null;
-	}
-
-	/**
-	 * Universal setter for any object inside an array. By default, this method
-	 * does nothing, but can be override.
-	 * 
-	 * @param v
-	 *            Array index.
-	 * @param index
-	 *            Index of the object within the array.
-	 * @param newObject
-	 *            The new object to assign.
-	 * 
-	 * @throws InvalidCommandException
-	 *             If any index is invalid.
-	 */
-	public void singleSetterV(int v, int index, Object newObject) throws InvalidCommandException {
-		// empty
-	}
-
-	/**
-	 * Universal getter for any array. By default, this method return
-	 * {@code null}, but can be override.
-	 * 
-	 * @param g
-	 *            Array index. If the index is doesn't match any array, this
-	 *            method returns {@code null}.
-	 * 
-	 * @return The selected array.
-	 * 
-	 * @see #singleGetterV(int, int)
-	 */
-	public Object[] vectorGetter(int g) {
-		return null;
-	}
-
-	/**
-	 * Universal setter for any array. By default, this method does nothing, but
-	 * can be override.
-	 * 
-	 * @param v
-	 *            Array index.
-	 * @param newVector
-	 *            The new array to assign.
-	 * 
-	 * @throws InvalidCommandException
-	 *             If the index is invalid (the array doesn't exists).
-	 */
-	public void vectorSetter(int v, Object[] newVector) throws InvalidCommandException {
-		// empty
-	}
-
-	/**
 	 * This method does any necessary action before create and show the window.
 	 * This method is invoked from
 	 * {@code loadWorkArea(String, int, int, boolean, int)}. By default, this
@@ -222,7 +152,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	}
 
 	/**
-	 * This method does any necessary action before create and show the window.
+	 * This method does any necessary action after create and show the window.
 	 * This method is invoked from
 	 * {@code loadWorkArea(String, int, int, boolean, int)}. By default, this
 	 * method does nothing, but can be override.
@@ -354,16 +284,13 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			beforeLoadArea();
 
 			switch (typeClosingWindow) {
-			// NO_CONFIRM_AT_CLOSE
-			case 0:
+			case JGenericWindow.NO_CONFIRM_AT_CLOSE:
 				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				break;
-			// CONFIRM_AT_CLOSE
-			case 1:
+			case JGenericWindow.CONFIRM_AT_CLOSE:
 				setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				break;
-			// CLOSE_NOT_MAIN_WINDOW
-			case 2:
+			case JGenericWindow.CLOSE_NOT_MAIN_WINDOW:
 				setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				break;
 			// ERROR! Neither of the 3!
@@ -549,15 +476,20 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		int realWidth;
 		int realHeight;
 
-		// FIXME Some OS restrict the actual workspace to assign them to the
-		// FIXME border and the title bar.
-		// FIXME Depending on the OS, we compensate for the missing part by
-		// FIXME adding the border size to the area.
+		// FIXME Insets Management
+		/*
+		 * Some OS restrict the actual workspace to assign them to the border
+		 * and the title bar. Depending on the OS, we compensate for the missing
+		 * part by adding the border size to the area.
+		 */
 
 		if (os.contains("Windows")) {
-			// FIXME Windows adds 2 extra pixels to the borders, causing some
-			// FIXME errors in custom graphics (games).
-			// FIXME However, this can change between Windows versions.
+			// FIXME Windows insets
+			/*
+			 * Windows adds 2 extra pixels to the borders, causing some errors
+			 * in custom graphics (games). However, this can change between
+			 * Windows versions.
+			 */
 			insetValues[0] = insets.top - 2;
 			insetValues[1] = insets.left - 2;
 		} else if (os.contains("Linux")) {
@@ -566,7 +498,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			insetValues[1] = 0;
 		}
 
-		// FIXME Untested on Mac (OSX)
+		// FIXME Untested on MacOS
 
 		realWidth = ((int) originalSize.getWidth()) + insetValues[1];
 		realHeight = ((int) originalSize.getHeight()) + insetValues[0];

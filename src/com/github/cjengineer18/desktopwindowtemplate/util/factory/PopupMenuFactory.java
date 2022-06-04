@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,23 +34,26 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
  * 
  * @author Cristian Jimenez
  */
-public class PopupMenuFactory {
+public abstract class PopupMenuFactory {
 
 	/** Indicates where's the separator. */
 	public static final String SEPARATOR = "_separator";
 
 	/**
-	 * Create a contextual menu ready to use in some component. The menu will share
-	 * the same listener for all options, whose functions will be defined by
-	 * {@code listener}.
+	 * Create a contextual menu ready to use in some component. The menu will
+	 * share the same listener for all options, whose functions will be defined
+	 * by {@code listener}.
 	 * 
-	 * @param listener The object that will listen to the menu items.
-	 * @param content  The items to add.
+	 * @param listener
+	 *            The object that will listen to the menu items.
+	 * @param content
+	 *            The items to add.
 	 * 
-	 * @return A {@link JPopupMenu} with all the items added and with the listener
-	 *         implemented.
+	 * @return A {@link JPopupMenu} with all the items added and with the
+	 *         listener implemented.
 	 * 
-	 * @throws InvalidParameterException In case any of the parameters is null.
+	 * @throws InvalidParameterException
+	 *             In case any of the parameters is null.
 	 */
 	public static JPopupMenu createPopupMenu(ActionListener listener, Object... content)
 			throws InvalidParameterException {
@@ -77,18 +80,21 @@ public class PopupMenuFactory {
 	}
 
 	/**
-	 * Create a context menu ready to use in a component. Each option of the menu
-	 * will have its own listener, so that each option performs a different
+	 * Create a context menu ready to use in a component. Each option of the
+	 * menu will have its own listener, so that each option performs a different
 	 * function.
 	 * 
-	 * @param listeners An array with all the listeners available.
-	 * @param content   The items to add.
+	 * @param listeners
+	 *            An array with all the listeners available.
+	 * @param content
+	 *            The items to add.
 	 * 
-	 * @return A {@link JPopupMenu} with all the items added and with the listener
-	 *         implemented.
+	 * @return A {@link JPopupMenu} with all the items added and with the
+	 *         listener implemented.
 	 * 
-	 * @throws InvalidParameterException In case any of the parameters is null or
-	 *                                   {@code listeners.length != content.length}.
+	 * @throws InvalidParameterException
+	 *             In case any of the parameters is null or
+	 *             {@code listeners.length != content.length}.
 	 */
 	public static JPopupMenu createPopupMenu(ActionListener[] listeners, String[] content)
 			throws InvalidParameterException {
@@ -107,22 +113,26 @@ public class PopupMenuFactory {
 	}
 
 	/**
-	 * Create a context menu ready to use in a component. This menu will share the
-	 * same listener for all the options, whose functions will be defined by
+	 * Create a context menu ready to use in a component. This menu will share
+	 * the same listener for all the options, whose functions will be defined by
 	 * {@code listener} and that will receive the commands defined in
 	 * {@code commands}. You should be aware that if there is a sub-menu or a
-	 * separator in {@code content [i]}, then the value in {@code commands [i]} must
-	 * be {@code null}.
+	 * separator in {@code content [i]}, then the value in {@code commands [i]}
+	 * must be {@code null}.
 	 * 
-	 * @param listener The object that will listen to the menu items.
-	 * @param content  The items to add.
-	 * @param commands The available commands.
+	 * @param listener
+	 *            The object that will listen to the menu items.
+	 * @param content
+	 *            The items to add.
+	 * @param commands
+	 *            The available commands.
 	 * 
-	 * @return A {@link JPopupMenu} with all the items added and with the listener
-	 *         and commands implemented.
+	 * @return A {@link JPopupMenu} with all the items added and with the
+	 *         listener and commands implemented.
 	 * 
-	 * @throws InvalidParameterException In case any of the parameters is null or
-	 *                                   {@code listeners.length != content.length}.
+	 * @throws InvalidParameterException
+	 *             In case any of the parameters is null or
+	 *             {@code listeners.length != content.length}.
 	 * 
 	 * @see #createPopupMenu(ActionListener, Object...)
 	 * @see #SEPARATOR
@@ -140,7 +150,7 @@ public class PopupMenuFactory {
 		}
 		return jpm;
 	}
-	
+
 	/*
 	 * Check if the content isn't a menu or a separator.
 	 */

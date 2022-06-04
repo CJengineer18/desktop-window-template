@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2019 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
  * 
  * @author Cristian Jimenez
  */
-public class DialogMaker {
+public abstract class DialogMaker {
 
 	/**
 	 * Creates a dialog with the specified content.

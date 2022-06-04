@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,24 +33,28 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
  * 
  * @author Cristian Jimenez
  */
-public class StandardMenuFactory {
+public abstract class StandardMenuFactory {
 
 	/** Indicates where's the separator. */
 	public static final String SEPARATOR = "_separator";
 
 	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
-	 * share the same listener for all options, whose functions will be defined by
-	 * {@code listener}.
+	 * share the same listener for all options, whose functions will be defined
+	 * by {@code listener}.
 	 * 
-	 * @param label    The menu's name.
-	 * @param listener The object that will listen to the menu items.
-	 * @param content  The items to add.
+	 * @param label
+	 *            The menu's name.
+	 * @param listener
+	 *            The object that will listen to the menu items.
+	 * @param content
+	 *            The items to add.
 	 * 
 	 * @return A {@link JMenu} with all the items added and with the listener
 	 *         implemented.
 	 * 
-	 * @throws InvalidParameterException In case any of the parameters is null.
+	 * @throws InvalidParameterException
+	 *             In case any of the parameters is null.
 	 */
 	public static JMenu createMenu(String label, ActionListener listener, Object... content)
 			throws InvalidParameterException {
@@ -78,23 +82,27 @@ public class StandardMenuFactory {
 
 	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
-	 * share the same listener for all the options, whose functions will be defined
-	 * by {@code listener} and that will receive the commands defined in
+	 * share the same listener for all the options, whose functions will be
+	 * defined by {@code listener} and that will receive the commands defined in
 	 * {@code commands}. You should be aware that if there is a submenu or a
-	 * separator in {@code content [i]}, then the value in {@code commands [i]} must
-	 * be {@code null}.
+	 * separator in {@code content [i]}, then the value in {@code commands [i]}
+	 * must be {@code null}.
 	 * 
-	 * @param label    The menu's name.
-	 * @param listener The object that will listen to the menu items.
-	 * @param content  The items to add.
-	 * @param commands The available commands.
+	 * @param label
+	 *            The menu's name.
+	 * @param listener
+	 *            The object that will listen to the menu items.
+	 * @param content
+	 *            The items to add.
+	 * @param commands
+	 *            The available commands.
 	 * 
-	 * @return A {@link JMenu} with all the items added and with the listener and
-	 *         commands implemented.
+	 * @return A {@link JMenu} with all the items added and with the listener
+	 *         and commands implemented.
 	 * 
-	 * @throws InvalidParameterException In case any of the parameters are null, not
-	 *                                   valid or
-	 *                                   {@code content.length != commands.length}.
+	 * @throws InvalidParameterException
+	 *             In case any of the parameters are null, not valid or
+	 *             {@code content.length != commands.length}.
 	 * 
 	 * @see #createMenu(String, ActionListener, Object...)
 	 * @see #SEPARATOR
@@ -114,20 +122,23 @@ public class StandardMenuFactory {
 	}
 
 	/**
-	 * Create a menu ready to use in a menu bar or in a sub-menu. Each option of the
-	 * menu will have its own listener, so that each option performs a different
-	 * function.
+	 * Create a menu ready to use in a menu bar or in a sub-menu. Each option of
+	 * the menu will have its own listener, so that each option performs a
+	 * different function.
 	 * 
-	 * @param label     The menu's name.
-	 * @param listeners An array with all the listeners available.
-	 * @param content   The items to add.
+	 * @param label
+	 *            The menu's name.
+	 * @param listeners
+	 *            An array with all the listeners available.
+	 * @param content
+	 *            The items to add.
 	 * 
 	 * @return A {@link JMenu} with all the items added and with the listener
 	 *         implemented.
 	 * 
-	 * @throws InvalidParameterException In case one of the parameters is null or
-	 *                                   that
-	 *                                   {@code listeners.length != content.length}.
+	 * @throws InvalidParameterException
+	 *             In case one of the parameters is null or that
+	 *             {@code listeners.length != content.length}.
 	 */
 	public static JMenu createMenu(String label, ActionListener[] listeners, String[] content)
 			throws InvalidParameterException {
