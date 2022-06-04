@@ -14,7 +14,7 @@ From version v1.0.2, you can now process asynchronous processes and tasks using 
 
 ## Changelog
 
-- 04-06-2022 (1.2): (Breaking change) Remove `vectorGetter(int)`, `vectorSetter(int, Object[])`, `singleGetterV(int, int)`, `singleSetterV(int, int, Object)` in favor of `singleGetter(int)` and `singleSetter(int, Object)`.
+- 04-06-2022 (1.2): (Breaking change) Remove `vectorGetter(int)`, `vectorSetter(int, Object[])`, `singleGetterV(int, int)`, `singleSetterV(int, int, Object)` in favor of `singleGetter(int)` and `singleSetter(int, Object)`. Make all factory classes abstract.
 - 25-12-2021 (1.1.0.3): Added exception support for AsyncProcessLoading.
 - 12-05-2020 (1.1.0.2): Added new functions in JGenericWindow and AsyncTask classes.
 - 08-01-2020 (1.1.0.1): Added buttons default locale text.
