@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktopwindowtemplate.util.async;
+package com.github.cjengineer18.desktopwindowtemplate.async;
 
 import java.awt.Window;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -32,7 +32,7 @@ import javax.swing.WindowConstants;
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
 import com.github.cjengineer18.desktopwindowtemplate.exception.AsyncProcessException;
 import com.github.cjengineer18.desktopwindowtemplate.exception.UnknownAsyncProcessException;
-import com.github.cjengineer18.desktopwindowtemplate.resources.constants.BundleConstants;
+import com.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
 import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
 /**

@@ -44,7 +44,7 @@ import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterE
 /**
  * Generic window for any desktop application.
  * 
- * @version v1.2
+ * @version v1.3
  * 
  * @author Cristian Jimenez
  * 

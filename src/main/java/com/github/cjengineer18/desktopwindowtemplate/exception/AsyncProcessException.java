@@ -19,23 +19,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktopwindowtemplate.resources.constants;
+package com.github.cjengineer18.desktopwindowtemplate.exception;
+
+import com.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
 
 /**
- * Contains the routes to locale bundles.
+ * This exception is thrown when an {@link Exception} was thrown during an async
+ * process.
  * 
- * @author Cristian Jimenez
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable)
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable, String)
+ * @see AsyncProcessLoading#loadAsyncProcess(java.awt.Window, Runnable, String,
+ *      String)
+ * 
+ * @author Cristian Jimenez Dzg
+ *
  */
-public interface BundleConstants {
+public class AsyncProcessException extends Exception {
 
-	/**
-	 * Bundle for panel's default text.
-	 */
-	public static final String PANELS_LOCALE = "com.github.cjengineer18.desktopwindowtemplate.resources.bundle.panels";
+	private static final long serialVersionUID = 8402899429558462504L;
 
-	/**
-	 * Bundle for button's default text.
-	 */
-	public static final String BUTTONS_LOCALE = "com.github.cjengineer18.desktopwindowtemplate.resources.bundle.buttons";
+	public AsyncProcessException(Throwable throwable) {
+		super(String.format("An error was thrown in an async process: %s", throwable.getMessage()), throwable);
+	}
 
 }

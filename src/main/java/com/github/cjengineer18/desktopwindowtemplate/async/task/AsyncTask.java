@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,30 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.cjengineer18.desktopwindowtemplate.util.async;
+package com.github.cjengineer18.desktopwindowtemplate.async.task;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 
+import com.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.ProgressPanel;
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
-import com.github.cjengineer18.desktopwindowtemplate.resources.constants.BundleConstants;
+import com.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
 import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
 /**
  * An utility method for async tasks. This class support arguments and can
- * return a result. A dialog appears to show the progress. This class uses a
- * {@code SwingWorker} for execution.
+ * return a result. A dialog appears to show the progress.
  * 
  * @author Cristian Jimenez
  *
@@ -50,20 +46,20 @@ import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
  *            The argument's class.
  * @param <Output>
  *            The result's class.
- * 
- * @see SwingWorker
  */
-public abstract class AsyncTask<Input, Output> {
+public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
+
+	// Fields
 
 	private Window parent;
 	private JDialog dialog;
-	private AsyncWorker worker;
 	private JPanel panel;
-	private Output result;
 	private String title;
 	private boolean enableCancel;
 	private boolean indeterminate;
 	private int step;
+
+	// Constructors
 
 	/**
 	 * Creates a new async task. With this constructor you can create
@@ -114,23 +110,19 @@ public abstract class AsyncTask<Input, Output> {
 		this.indeterminate = indeterminate;
 	}
 
-	// Public functions
+	// Methods
+	// For overrider methods, see parent's documentation.
 
-	/**
-	 * Executes the process, passing the arguments if required. Unlike
-	 * {@code SwingWorker.execute()}, this method can be used many times.
-	 * 
-	 * @param inputs
-	 *            The arguments
-	 * 
-	 * @see SwingWorker#execute()
-	 */
+	// Public methods
+
+	@Override
 	@SafeVarargs
 	public final void execute(Input... inputs) {
 		ResourceBundle buttons = ResourceBundle.getBundle(BundleConstants.BUTTONS_LOCALE);
 		ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 		JButton cancelButton = new JButton(buttons.getString("cancelButton"));
-		worker = new AsyncWorker(this, inputs);
+
+		worker = new AsyncWorker<Input, Output>(this, inputs);
 		panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage")) : new ProgressPanel(new String());
 		dialog = DialogMaker.makeDialog(parent, title, panel, enableCancel ? new JButton[] { cancelButton } : null);
 
@@ -146,76 +138,14 @@ public abstract class AsyncTask<Input, Output> {
 		dialog.setVisible(true);
 	}
 
-	/**
-	 * Calls the {@code SwingWorker.get()} to get the result of the process, or
-	 * return it immediately if this task has been executed successfully. Return
-	 * {@code null} if the task has cancelled. You must call {@code execute()}
-	 * before call this.
-	 * 
-	 * @return The task's result.
-	 * 
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 * 
-	 * @see SwingWorker#get()
-	 * @see #execute(Object...)
-	 */
-	public final Output get() throws InterruptedException, ExecutionException {
-		if (!worker.isDone()) {
-			return worker.get();
-		} else {
-			return worker.isCancelled() ? null : result;
-		}
-	}
+	// Protected methods
 
-	/**
-	 * Calls the {@code SwingWorker.get(long, TimeUnit)} to get the result of
-	 * the process, or return it immediately if this task has been executed
-	 * successfully. Return {@code null} if the task has cancelled. You must
-	 * call {@code execute()} before call this.
-	 * 
-	 * @param timeout
-	 *            The time to wait.
-	 * @param unit
-	 *            The time unit.
-	 * 
-	 * @return The task's result.
-	 * 
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 * @throws TimeoutException
-	 * 
-	 * @see SwingWorker#get(long, TimeUnit)
-	 * @see #execute(Object...)
-	 */
-	public final Output get(long timeout, TimeUnit unit)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		if (!worker.isDone()) {
-			return worker.get(timeout, unit);
-		} else {
-			return worker.isCancelled() ? null : result;
-		}
+	@Override
+	protected final void finish(Output result) {
+		dialog.dispose();
+		this.result = result;
+		done(result);
 	}
-
-	/**
-	 * Checks if the task is done.
-	 * 
-	 * @return {@code true} if the task is done.
-	 */
-	public final boolean isDone() {
-		return (worker == null) ? false : worker.isDone();
-	}
-
-	/**
-	 * Checks if the task is cancelled.
-	 * 
-	 * @return {@code true} if the task is cancelled.
-	 */
-	public final boolean isCancelled() {
-		return (worker == null) ? false : worker.isCancelled();
-	}
-
-	// Protected functions
 
 	/**
 	 * Get the window parent
@@ -255,79 +185,6 @@ public abstract class AsyncTask<Input, Output> {
 		if (!indeterminate) {
 			((ProgressPanel) panel).setMessage(message);
 		}
-	}
-
-	/**
-	 * This method is called when {@code doInBackground(Input[])} finish.
-	 * Process the output result in the main thread.
-	 * 
-	 * @param output
-	 *            The task's result.
-	 * 
-	 * @see #doInBackground(Object[])
-	 */
-	protected void done(Output output) {
-		// empty
-	};
-
-	/**
-	 * The task to execute in an async thread. Returns a result or throws an
-	 * exception. Unlike {@code SwingWorker.doInBackground()}, multiple calls of
-	 * {@code execute()} invokes {@code doInBackground(Input[])} multiple times.
-	 * 
-	 * @param inputs
-	 *            The parameters from {@code execute(Input...)}.
-	 * 
-	 * @return A result.
-	 * 
-	 * @throws Exception
-	 *             If any error.
-	 * 
-	 * @see SwingWorker#doInBackground()
-	 * @see #execute(Object...)
-	 * @see #done(Object)
-	 */
-	protected abstract Output doInBackground(Input[] inputs) throws Exception;
-
-	// Private functions
-
-	/*
-	 * Closes the dialog and save the result before invoke done(Output).
-	 * 
-	 * @param result The result.
-	 */
-	private void finish(Output result) {
-		dialog.dispose();
-		this.result = result;
-		done(result);
-	}
-
-	/*
-	 * Private worker used to execute the assigned task.
-	 */
-	private class AsyncWorker extends SwingWorker<Output, Void> {
-
-		private AsyncTask<Input, Output> task;
-		private Input[] inputs;
-		private Output result;
-
-		private AsyncWorker(AsyncTask<Input, Output> task, Input[] inputs) {
-			this.task = task;
-			this.inputs = inputs;
-		}
-
-		@Override
-		protected Output doInBackground() throws Exception {
-			result = task.doInBackground(inputs);
-
-			return result;
-		}
-
-		@Override
-		protected void done() {
-			task.finish(result);
-		}
-
 	}
 
 }
