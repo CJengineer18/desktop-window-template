@@ -121,39 +121,29 @@ public abstract class AsyncProcessLoading {
 		} else {
 			thread = new Thread(runnable);
 
-			thread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-
-				@Override
-				public void uncaughtException(Thread thread, Throwable throwable) {
-					if (throwable instanceof RuntimeException) {
-						if (throwable.getCause() != null) {
-							threadException.set(throwable.getCause());
-						} else {
-							threadException.set(new UnknownAsyncProcessException());
-						}
+			thread.setUncaughtExceptionHandler((th, error) -> {
+				if (error instanceof RuntimeException) {
+					if (error.getCause() != null) {
+						threadException.set(error.getCause());
 					} else {
-						threadException.set(throwable);
+						threadException.set(new UnknownAsyncProcessException());
 					}
-
-					thread.interrupt();
+				} else {
+					threadException.set(error);
 				}
 
+				th.interrupt();
 			});
 		}
 
 		// This daemon thread checks if the main thread was finish and close the
 		// dialog when finished.
-		daemon = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while (thread.isAlive()) {
-					// Wait until main thread finish
-				}
-
-				dialog.dispose();
+		daemon = new Thread(() -> {
+			while (thread.isAlive()) {
+				// Wait until main thread finish
 			}
 
+			dialog.dispose();
 		});
 
 		daemon.setDaemon(true);

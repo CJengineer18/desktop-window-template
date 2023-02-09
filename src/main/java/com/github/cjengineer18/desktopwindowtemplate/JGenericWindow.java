@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,11 @@
 package com.github.cjengineer18.desktopwindowtemplate;
 
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +39,7 @@ import javax.swing.WindowConstants;
 
 import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidCommandException;
 import com.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import com.github.cjengineer18.desktopwindowtemplate.util.Utilities;
 
 /**
  * Generic window for any desktop application.
@@ -56,10 +56,10 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	private static final long serialVersionUID = 68482L;
 	private static final Dimension minimumSize = new Dimension(200, 200);
 
-	/* Private Attributes */
+	/* Private Fields */
 
-	private ArrayList<WindowListener> listeners1;
-	private ArrayList<WindowStateListener> listeners2;
+	private LinkedList<WindowListener> listeners1;
+	private LinkedList<WindowStateListener> listeners2;
 	private Dimension originalSize;
 	private Dimension realSize;
 
@@ -88,8 +88,9 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	/** Default builder. */
 	public JGenericWindow() {
 		super();
-		listeners1 = new ArrayList<WindowListener>();
-		listeners2 = new ArrayList<WindowStateListener>();
+
+		listeners1 = new LinkedList<WindowListener>();
+		listeners2 = new LinkedList<WindowStateListener>();
 	}
 
 	// Abstract methods
@@ -123,7 +124,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 	/**
 	 * Here's all the window build. This method is invoked from
-	 * {@code loadWorkArea(String, int, int, boolean, int)}
+	 * {@code loadWorkArea(String, int, int, boolean, int)}.
 	 * 
 	 * @throws Exception
 	 *             If any error.
@@ -260,27 +261,25 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	protected final void loadWorkArea(String title, int width, int height, boolean fixedWindow, int typeClosingWindow)
 			throws Exception {
 		Dimension screen;
-		JFrame dummy;
-		Insets windowInsets;
 		int x;
 		int y;
 
 		if (((width >= minimumSize.getWidth()) && (height >= minimumSize.getHeight())) && (title != null)) {
 			screen = Toolkit.getDefaultToolkit().getScreenSize();
-			setTitle(title);
+
 			originalSize = new Dimension(width, height);
-			dummy = new JFrame();
-			dummy.setLayout(null);
-			dummy.pack();
-			windowInsets = (Insets) dummy.getInsets().clone();
-			realSize = createWorkArea(originalSize, windowInsets);
+			realSize = Utilities.createWorkArea(originalSize);
+
+			setTitle(title);
 			setSize(realSize);
 			setPreferredSize(realSize);
+
 			x = (int) ((screen.getWidth() / 2) - (realSize.getWidth() / 2));
 			y = (int) ((screen.getHeight() / 2) - (realSize.getHeight() / 2));
+
 			setLocation(x, y);
 			setResizable(!fixedWindow);
-			tolerableMinimumSize(windowInsets);
+			tolerableMinimumSize();
 			beforeLoadArea();
 
 			switch (typeClosingWindow) {
@@ -293,26 +292,21 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			case JGenericWindow.CLOSE_NOT_MAIN_WINDOW:
 				setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				break;
-			// ERROR! Neither of the 3!
+			// ERROR! None of the 3!
 			default:
 				throw new InvalidParameterException(
 						String.format(Locale.ENGLISH, "typeClosingWindow = %d?", typeClosingWindow));
 			}
 
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						workArea();
-						pack();
-						setVisible(true);
-						executeAfterLoadArea();
-					} catch (Exception exc) {
-						Logger.getLogger(JGenericWindow.class.getName()).log(Level.SEVERE, exc.getMessage(), exc);
-					}
+			SwingUtilities.invokeLater(() -> {
+				try {
+					workArea();
+					pack();
+					setVisible(true);
+					executeAfterLoadArea();
+				} catch (Exception exc) {
+					Logger.getLogger(JGenericWindow.class.getName()).log(Level.SEVERE, exc.getMessage(), exc);
 				}
-
 			});
 		} else {
 			if ((width <= 0) || (height <= 0)) {
@@ -392,23 +386,18 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * @see #addListeners(WindowStateListener...)
 	 */
 	protected final void enableListeners() {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				if (!listeners1.isEmpty()) {
-					for (WindowListener wl : listeners1) {
-						addWindowListener(wl);
-					}
-				}
-
-				if (!listeners2.isEmpty()) {
-					for (WindowStateListener wsl : listeners2) {
-						addWindowStateListener(wsl);
-					}
+		SwingUtilities.invokeLater(() -> {
+			if (!listeners1.isEmpty()) {
+				for (WindowListener wl : listeners1) {
+					addWindowListener(wl);
 				}
 			}
 
+			if (!listeners2.isEmpty()) {
+				for (WindowStateListener wsl : listeners2) {
+					addWindowStateListener(wsl);
+				}
+			}
 		});
 	}
 
@@ -462,50 +451,11 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	/*
 	 * Adjust the minimum size to the minimum tolerable size.
 	 */
-	private void tolerableMinimumSize(Insets insets) {
-		setMinimumSize(createWorkArea(minimumSize, insets));
+	private void tolerableMinimumSize() {
+		setMinimumSize(Utilities.createWorkArea(minimumSize));
 	}
 
-	/*
-	 * Create the work area for the window.
-	 */
-	private Dimension createWorkArea(Dimension originalSize, Insets insets) {
-		int[] insetValues = new int[2];
-		String os = System.getProperty("os.name");
-
-		int realWidth;
-		int realHeight;
-
-		// FIXME Insets Management
-		/*
-		 * Some OS restrict the actual workspace to assign them to the border
-		 * and the title bar. Depending on the OS, we compensate for the missing
-		 * part by adding the border size to the area.
-		 */
-
-		if (os.contains("Windows")) {
-			// FIXME Windows insets
-			/*
-			 * Windows adds 2 extra pixels to the borders, causing some errors
-			 * in custom graphics (games). However, this can change between
-			 * Windows versions.
-			 */
-			insetValues[0] = insets.top - 2;
-			insetValues[1] = insets.left - 2;
-		} else if (os.contains("Linux")) {
-			// FIXME Untested on all distros
-			insetValues[0] = 0;
-			insetValues[1] = 0;
-		}
-
-		// FIXME Untested on MacOS
-
-		realWidth = ((int) originalSize.getWidth()) + insetValues[1];
-		realHeight = ((int) originalSize.getHeight()) + insetValues[0];
-
-		return new Dimension(realWidth, realHeight);
-	}
-
+	// Execute before the window loaded and show.
 	private void executeAfterLoadArea() throws Exception {
 		afterLoadArea();
 		restore();

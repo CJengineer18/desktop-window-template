@@ -22,8 +22,6 @@
 package com.github.cjengineer18.desktopwindowtemplate.async.task;
 
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -126,14 +124,10 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage")) : new ProgressPanel(new String());
 		dialog = DialogMaker.makeDialog(parent, title, panel, enableCancel ? new JButton[] { cancelButton } : null);
 
-		cancelButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				worker.cancel(true);
-			}
-
+		cancelButton.addActionListener(evt -> {
+			worker.cancel(true);
 		});
+
 		worker.execute();
 		dialog.setVisible(true);
 	}
