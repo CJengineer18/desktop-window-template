@@ -31,7 +31,10 @@ import javax.swing.JOptionPane;
  * An utility for create dialogs.
  * 
  * @author Cristian Jimenez
+ * 
+ * @deprecated Dialogs can be build with new component {@code JModalDialog}.
  */
+@Deprecated
 public abstract class DialogMaker {
 
 	/**

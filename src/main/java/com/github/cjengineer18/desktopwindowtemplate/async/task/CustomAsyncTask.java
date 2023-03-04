@@ -22,11 +22,16 @@
 package com.github.cjengineer18.desktopwindowtemplate.async.task;
 
 /**
+ * This class works like {@code AsyncTask}, but it support custom loading ui.
  * 
  * @author CJengineer18
  *
  * @param <Input>
+ *            The Input class.
  * @param <Output>
+ *            The Output class.
+ * 
+ * @see AsyncTask
  */
 public abstract class CustomAsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
 
@@ -50,7 +55,8 @@ public abstract class CustomAsyncTask<Input, Output> extends AbstractAsyncTask<I
 	// Abstract methods
 
 	/**
-	 * 
+	 * Executes in the main thread before the background task begins. Useful for
+	 * create and show custom "loading" ui.
 	 */
 	protected abstract void beforeExecution();
 

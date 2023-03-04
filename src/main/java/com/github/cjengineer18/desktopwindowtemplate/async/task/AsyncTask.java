@@ -21,18 +21,19 @@
  */
 package com.github.cjengineer18.desktopwindowtemplate.async.task;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Window;
 import java.util.ResourceBundle;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import com.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
+import com.github.cjengineer18.desktopwindowtemplate.component.AcceptCancelDialogFooter;
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.ProgressPanel;
 import com.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
+import com.github.cjengineer18.desktopwindowtemplate.dialog.JModalDialog;
 import com.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
-import com.github.cjengineer18.desktopwindowtemplate.util.factory.DialogMaker;
 
 /**
  * An utility method for async tasks. This class support arguments and can
@@ -50,7 +51,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	// Fields
 
 	private Window parent;
-	private JDialog dialog;
+	private AsyncTaskLoadDialog dialog;
 	private JPanel panel;
 	private String title;
 	private boolean enableCancel;
@@ -116,17 +117,11 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	@Override
 	@SafeVarargs
 	public final void execute(Input... inputs) {
-		ResourceBundle buttons = ResourceBundle.getBundle(BundleConstants.BUTTONS_LOCALE);
 		ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
-		JButton cancelButton = new JButton(buttons.getString("cancelButton"));
 
 		worker = new AsyncWorker<Input, Output>(this, inputs);
 		panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage")) : new ProgressPanel(new String());
-		dialog = DialogMaker.makeDialog(parent, title, panel, enableCancel ? new JButton[] { cancelButton } : null);
-
-		cancelButton.addActionListener(evt -> {
-			worker.cancel(true);
-		});
+		dialog = new AsyncTaskLoadDialog();
 
 		worker.execute();
 		dialog.setVisible(true);
@@ -137,7 +132,9 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	@Override
 	protected final void finish(Output result) {
 		dialog.dispose();
+
 		this.result = result;
+
 		done(result);
 	}
 
@@ -179,6 +176,34 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		if (!indeterminate) {
 			((ProgressPanel) panel).setMessage(message);
 		}
+	}
+
+	// Private classes
+
+	private class AsyncTaskLoadDialog extends JModalDialog {
+
+		public AsyncTaskLoadDialog() {
+			super(parent, title);
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected void workArea() throws Exception {
+			Container container = getContentPane();
+			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this, false, enableCancel);
+
+			if (enableCancel) {
+				footer.onCancel(e -> {
+					worker.cancel(true);
+				});
+			}
+
+			container.setLayout(new BorderLayout());
+			container.add(BorderLayout.CENTER, panel);
+			container.add(BorderLayout.SOUTH, footer);
+		}
+
 	}
 
 }
