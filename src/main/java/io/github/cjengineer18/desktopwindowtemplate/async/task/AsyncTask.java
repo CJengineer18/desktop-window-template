@@ -27,6 +27,7 @@ import java.awt.Window;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import io.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
 import io.github.cjengineer18.desktopwindowtemplate.component.AcceptCancelDialogFooter;
@@ -41,17 +42,15 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  * 
  * @author Cristian Jimenez
  *
- * @param <Input>
- *            The argument's class.
- * @param <Output>
- *            The result's class.
+ * @param <Input>  The argument's class.
+ * @param <Output> The result's class.
  */
 public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
 
 	// Fields
 
 	private Window parent;
-	private AsyncTaskLoadDialog dialog;
+	private Dialog dialog;
 	private JPanel panel;
 	private String title;
 	private boolean enableCancel;
@@ -61,12 +60,11 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	// Constructors
 
 	/**
-	 * Creates a new async task. With this constructor you can create
-	 * indeterminate progress task. Note what this version of AsyncTask still be
-	 * return something, otherwise you must use {@code AsyncProcessLoading}.
+	 * Creates a new async task. With this constructor you can create indeterminate
+	 * progress task. Note what this version of AsyncTask still be return something,
+	 * otherwise you must use {@code AsyncProcessLoading}.
 	 * 
-	 * @param parent
-	 *            A window parent. If {@code null}, a default frame is used.
+	 * @param parent A window parent. If {@code null}, a default frame is used.
 	 * 
 	 * @see AsyncProcessLoading
 	 */
@@ -77,10 +75,8 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	/**
 	 * Creates a new async task.
 	 * 
-	 * @param parent
-	 *            A window parent. If {@code null}, a default frame is used.
-	 * @param step
-	 *            The progress step.
+	 * @param parent A window parent. If {@code null}, a default frame is used.
+	 * @param step   The progress step.
 	 */
 	public AsyncTask(Window parent, int step) {
 		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, false,
@@ -90,16 +86,12 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	/**
 	 * Creates a new async task.
 	 * 
-	 * @param parent
-	 *            A window parent. If {@code null}, a default frame is used.
-	 * @param title
-	 *            A title for the dialog title.
-	 * @param step
-	 *            The progress step.
-	 * @param indeterminate
-	 *            If {@code true}, disables progress monitoring.
-	 * @param enableCancel
-	 *            If this process can be cancelled.
+	 * @param parent        A window parent. If {@code null}, a default frame is
+	 *                      used.
+	 * @param title         A title for the dialog title.
+	 * @param step          The progress step.
+	 * @param indeterminate If {@code true}, disables progress monitoring.
+	 * @param enableCancel  If this process can be cancelled.
 	 */
 	public AsyncTask(Window parent, String title, int step, boolean indeterminate, boolean enableCancel) {
 		this.parent = parent;
@@ -117,14 +109,19 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	@Override
 	@SafeVarargs
 	public final void execute(Input... inputs) {
-		ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+		try {
+			ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 
-		worker = new AsyncWorker<Input, Output>(this, inputs);
-		panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage")) : new ProgressPanel(new String());
-		dialog = new AsyncTaskLoadDialog();
+			worker = new AsyncWorker<Input, Output>(this, inputs);
+			panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage"))
+					: new ProgressPanel(new String());
+			dialog = new Dialog();
 
-		worker.execute();
-		dialog.setVisible(true);
+			worker.execute();
+			dialog.setVisible(true);
+		} catch (Exception exc) {
+
+		}
 	}
 
 	// Protected methods
@@ -157,8 +154,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	/**
 	 * Adds a progress delta.
 	 * 
-	 * @param delta
-	 *            The progress change.
+	 * @param delta The progress change.
 	 */
 	protected final void addDelta(int delta) {
 		if (!indeterminate) {
@@ -169,8 +165,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	/**
 	 * Updates the dialog's message.
 	 * 
-	 * @param message
-	 *            The new message.
+	 * @param message The new message.
 	 */
 	protected final void updateMessage(String message) {
 		if (!indeterminate) {
@@ -180,18 +175,26 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 
 	// Private classes
 
-	private class AsyncTaskLoadDialog extends JModalDialog {
-
-		public AsyncTaskLoadDialog() {
-			super(parent, title);
-		}
+	private class Dialog extends JModalDialog {
 
 		private static final long serialVersionUID = 1L;
+
+		Dialog() throws Exception {
+			super(parent, title);
+
+			loadWorkArea(250, 120);
+		}
+
+		@Override
+		protected void afterLoadArea() throws Exception {
+			setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		}
 
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
 			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this, false, enableCancel);
+			String[] cardinals = { BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.WEST };
 
 			if (enableCancel) {
 				footer.onCancel(e -> {
@@ -202,6 +205,10 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 			container.setLayout(new BorderLayout());
 			container.add(BorderLayout.CENTER, panel);
 			container.add(BorderLayout.SOUTH, footer);
+
+			for (String str : cardinals) {
+				container.add(str, new JPanel());
+			}
 		}
 
 	}

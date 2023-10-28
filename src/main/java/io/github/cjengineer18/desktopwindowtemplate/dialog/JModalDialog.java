@@ -56,12 +56,10 @@ public abstract class JModalDialog extends JDialog {
 	/**
 	 * Builds the dialog.
 	 * 
-	 * @param window
-	 *            The window parent.
-	 * @param title
-	 *            The dialog title.
+	 * @param window The window parent.
+	 * @param title  The dialog title.
 	 */
-	public JModalDialog(Window window, String title) {
+	public JModalDialog(Window window, String title) throws Exception {
 		super(window, title);
 
 		this.window = window;
@@ -76,8 +74,7 @@ public abstract class JModalDialog extends JDialog {
 	 * Here's all the window build. This method is invoked from
 	 * {@code loadWorkArea(int, int)}.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(int, int)
 	 */
@@ -88,12 +85,11 @@ public abstract class JModalDialog extends JDialog {
 	// developer's choice override them
 
 	/**
-	 * This method does any necessary action before create and show the window.
-	 * This method is invoked from {@code loadWorkArea(int, int)}. By default,
-	 * this method does nothing, but can be override.
+	 * This method does any necessary action before create and show the window. This
+	 * method is invoked from {@code loadWorkArea(int, int)}. By default, this
+	 * method does nothing, but can be override.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(int, int)
 	 */
@@ -102,12 +98,11 @@ public abstract class JModalDialog extends JDialog {
 	}
 
 	/**
-	 * This method does any necessary action after create and show the window.
-	 * This method is invoked from {@code loadWorkArea(int, int)}. By default,
-	 * this method does nothing, but can be override.
+	 * This method does any necessary action after create and show the window. This
+	 * method is invoked from {@code loadWorkArea(int, int)}. By default, this
+	 * method does nothing, but can be override.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(int, int)
 	 */
@@ -124,23 +119,19 @@ public abstract class JModalDialog extends JDialog {
 		setSize(realSize);
 		setPreferredSize(realSize);
 		pack();
-		setVisible(true);
 	}
 
 	/**
-	 * Invoke <b>only</b> inside the builder. Here an empty frame is created
-	 * with the required specifications and filled as implemented by
-	 * {@code beforeLoadArea()} and {@code workArea()}. The position of the
-	 * dialog is +10px to the bottom and +10px to the right according to the
-	 * parent's top-left corner.
+	 * Invoke <b>only</b> inside the builder. Here an empty frame is created with
+	 * the required specifications and filled as implemented by
+	 * {@code beforeLoadArea()} and {@code workArea()}. The position of the dialog
+	 * is +10px to the bottom and +10px to the right according to the parent's
+	 * top-left corner.
 	 * 
-	 * @param width
-	 *            The width.
-	 * @param height
-	 *            The height
+	 * @param width  The width.
+	 * @param height The height
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 */
 	protected final void loadWorkArea(int width, int height) throws Exception {
 		originalSize = new Dimension(width, height);
@@ -159,7 +150,6 @@ public abstract class JModalDialog extends JDialog {
 			try {
 				workArea();
 				pack();
-				setVisible(true);
 				executeAfterLoadArea();
 			} catch (Exception e) {
 				Logger.getLogger(JModalDialog.class.getName()).log(Level.SEVERE, e.getMessage(), e);
