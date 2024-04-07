@@ -109,19 +109,14 @@ public final class AsyncProcessLoading {
 	 */
 	public static void loadAsyncProcess(Window parent, IProcess process, String title, String message)
 			throws AsyncProcessException {
-		loadAsyncProcess(parent, new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					process.execute();
-				} catch (Exception exc) {
-					THREAD_ERROR.set(exc);
-				} finally {
-					dialog.dispose();
-				}
+		loadAsyncProcess(parent, (Runnable) () -> {
+			try {
+				process.execute();
+			} catch (Exception exc) {
+				THREAD_ERROR.set(exc);
+			} finally {
+				dialog.dispose();
 			}
-
 		}, title, message);
 	}
 
