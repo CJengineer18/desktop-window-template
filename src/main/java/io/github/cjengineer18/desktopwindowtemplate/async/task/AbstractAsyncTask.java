@@ -31,10 +31,8 @@ import java.util.concurrent.TimeoutException;
  * 
  * @author CJengineer18
  *
- * @param <Input>
- *            The argument's class.
- * @param <Output>
- *            The result's class.
+ * @param <Input>  The argument's class.
+ * @param <Output> The result's class.
  * 
  * @see AsyncTask
  * @see CustomAsyncTask
@@ -54,8 +52,8 @@ abstract class AbstractAsyncTask<Input, Output> {
 	// Public methods
 
 	/**
-	 * Calls the worker's {@code get()} to get the result of the process, or
-	 * return it immediately if this task has been executed successfully. Return
+	 * Calls the worker's {@code get()} to get the result of the process, or return
+	 * it immediately if this task has been executed successfully. Return
 	 * {@code null} if the task has cancelled. You must call {@code execute()}
 	 * before call this.
 	 * 
@@ -77,13 +75,11 @@ abstract class AbstractAsyncTask<Input, Output> {
 	/**
 	 * Calls the worker's {@code get(long, TimeUnit)} to get the result of the
 	 * process, or return it immediately if this task has been executed
-	 * successfully. Return {@code null} if the task has cancelled. You must
-	 * call {@code execute()} before call this.
+	 * successfully. Return {@code null} if the task has cancelled. You must call
+	 * {@code execute()} before call this.
 	 * 
-	 * @param timeout
-	 *            The time to wait.
-	 * @param unit
-	 *            The time unit.
+	 * @param timeout The time to wait.
+	 * @param unit    The time unit.
 	 * 
 	 * @return The task's result.
 	 * 
@@ -123,25 +119,37 @@ abstract class AbstractAsyncTask<Input, Output> {
 	// Protected methods
 
 	/**
-	 * This method is called when {@code doInBackground(Input[])} finish.
-	 * Process the output result in the main thread.
+	 * This method is called when {@code doInBackground(Input[])} finish. Process
+	 * the output result in the main thread, unless an exception is thrown.
 	 * 
-	 * @param output
-	 *            The task's result.
+	 * @param output The task's result.
 	 * 
 	 * @see #doInBackground(Object[])
+	 * @see #handleError(Exception)
 	 */
 	protected void done(Output output) {
 		// empty
-	};
+	}
+
+	/**
+	 * This method is called when {@code doInBackground(Input[])} throws an
+	 * exception. Handles the exception according to the programmer.
+	 * 
+	 * @param exception The exception.
+	 * 
+	 * @see #doInBackground(Object[])
+	 * @see #done(Object)
+	 */
+	protected void handleError(Exception exception) {
+		// empty
+	}
 
 	// Abstract methods
 
 	/**
 	 * Executes the process, passing the arguments if required.
 	 * 
-	 * @param inputs
-	 *            The arguments
+	 * @param inputs The arguments
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
@@ -151,13 +159,11 @@ abstract class AbstractAsyncTask<Input, Output> {
 	 * The task to execute in an async thread. Returns a result or throws an
 	 * exception.
 	 * 
-	 * @param inputs
-	 *            The parameters from {@code execute(Input...)}.
+	 * @param inputs The parameters from {@code execute(Input...)}.
 	 * 
 	 * @return A result.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #execute(Object...)
 	 * @see #done(Object)
@@ -167,8 +173,7 @@ abstract class AbstractAsyncTask<Input, Output> {
 	/**
 	 * Make the post-process to the result before call {@code done(Output)}.
 	 * 
-	 * @param result
-	 *            The result.
+	 * @param result The result.
 	 */
 	protected abstract void finish(Output result);
 }

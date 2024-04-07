@@ -21,6 +21,8 @@
  */
 package io.github.cjengineer18.desktopwindowtemplate.async.task;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -28,10 +30,8 @@ import javax.swing.SwingWorker;
  * 
  * @author CJengineer18
  *
- * @param <Input>
- *            The argument's class.
- * @param <Output>
- *            The result's class.
+ * @param <Input>  The argument's class.
+ * @param <Output> The result's class.
  * 
  * @see AbstractAsyncTask
  */
@@ -40,17 +40,37 @@ class AsyncWorker<Input, Output> extends SwingWorker<Output, Void> {
 	private AbstractAsyncTask<Input, Output> task;
 	private Input[] inputs;
 	private Output result;
+	private AtomicReference<Exception> error;
 
 	AsyncWorker(AbstractAsyncTask<Input, Output> task, Input[] inputs) {
 		this.task = task;
 		this.inputs = inputs;
+		this.error = new AtomicReference<Exception>();
 	}
+
+	// Internal methods
+
+	Exception getError() {
+		return error.get();
+	}
+
+	boolean hasError() {
+		return error.get() != null;
+	}
+
+	// Implemented methods
 
 	@Override
 	protected Output doInBackground() throws Exception {
-		result = task.doInBackground(inputs);
+		try {
+			result = task.doInBackground(inputs);
 
-		return result;
+			return result;
+		} catch (Exception exc) {
+			error.set(exc);
+
+			throw exc;
+		}
 	}
 
 	@Override

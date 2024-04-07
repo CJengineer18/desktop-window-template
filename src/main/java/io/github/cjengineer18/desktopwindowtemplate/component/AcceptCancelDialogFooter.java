@@ -40,6 +40,25 @@ public class AcceptCancelDialogFooter extends JPanel {
 
 	private static final long serialVersionUID = 205L;
 
+	// Flags
+
+	/**
+	 * Indicates that the buttons will be centered.
+	 */
+	public static final int ACDF_CENTER_BUTTONS = 0x10;
+
+	/**
+	 * Add an "Accept" button.
+	 */
+	public static final int ACDF_ACCEPT = 0x1;
+
+	/**
+	 * Add a "Cancel" button.
+	 */
+	public static final int ACDF_CANCEL = 0x2;
+
+	// Fields
+
 	private JDialog dialog;
 	private JButton acceptButton;
 	private JButton cancelButton;
@@ -48,41 +67,40 @@ public class AcceptCancelDialogFooter extends JPanel {
 	private ActionListener onAcceptAction;
 	private ActionListener onCancelAction;
 
+	// Constructors
+
 	/**
 	 * Creates a new component. By default both buttons are visible.
 	 * 
-	 * @param dialog
-	 *            The dialog host.
+	 * @param dialog The dialog host.
 	 */
 	public AcceptCancelDialogFooter(JDialog dialog) {
-		this(dialog, true, true);
+		this(dialog, 19);
 	}
 
 	/**
-	 * Creates a new component. You can choose which button show.
+	 * Creates a new component. You can choose which button show and the positions.
 	 * 
-	 * @param dialog
-	 *            The dialog host.
-	 * @param showAcceptButton
-	 *            {@code true} to show an 'Accept' button.
-	 * @param showCancelButton
-	 *            {@code true} to show an 'Cancel' button.
+	 * @param dialog  The dialog host.
+	 * @param options The options. Any of them: {@link #ACDF_ACCEPT},
+	 *                {@link #ACDF_CANCEL} and {@link #ACDF_CENTER_BUTTONS}
 	 */
-	public AcceptCancelDialogFooter(JDialog dialog, boolean showAcceptButton, boolean showCancelButton) {
-		super(new FlowLayout(FlowLayout.TRAILING));
+	public AcceptCancelDialogFooter(JDialog dialog, int options) {
+		super(new FlowLayout((options & ACDF_CENTER_BUTTONS) != 0 ? FlowLayout.CENTER : FlowLayout.TRAILING));
 
 		this.dialog = dialog;
-		this.showAcceptButton = showAcceptButton;
-		this.showCancelButton = showCancelButton;
+		this.showAcceptButton = (options & ACDF_ACCEPT) != 0;
+		this.showCancelButton = (options & ACDF_CANCEL) != 0;
 
 		createNewInstance();
 	}
 
+	// Public methods
+
 	/**
 	 * Executes an {@link ActionListener} when the 'Accept' button is pressed.
 	 * 
-	 * @param listener
-	 *            The listener.
+	 * @param listener The listener.
 	 */
 	public void onAccept(ActionListener listener) {
 		if (showAcceptButton) {
@@ -93,14 +111,15 @@ public class AcceptCancelDialogFooter extends JPanel {
 	/**
 	 * Executes an {@link ActionListener} when the 'Cancel' button is pressed.
 	 * 
-	 * @param listener
-	 *            The listener.
+	 * @param listener The listener.
 	 */
 	public void onCancel(ActionListener listener) {
 		if (showCancelButton) {
 			this.onCancelAction = listener;
 		}
 	}
+
+	// Private methods
 
 	// Creates the new class instance.
 	private void createNewInstance() {
@@ -110,7 +129,7 @@ public class AcceptCancelDialogFooter extends JPanel {
 		};
 
 		if (showAcceptButton) {
-			acceptButton = new JButton("Aceptar");
+			acceptButton = new JButton(buttonBundle.getString("acceptButton"));
 
 			if (onAcceptAction != null) {
 				acceptButton.addActionListener(onAcceptAction);

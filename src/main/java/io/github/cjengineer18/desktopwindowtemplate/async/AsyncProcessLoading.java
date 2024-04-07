@@ -24,11 +24,12 @@ package io.github.cjengineer18.desktopwindowtemplate.async;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Window;
+import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JPanel;
@@ -37,7 +38,6 @@ import javax.swing.WindowConstants;
 import io.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
 import io.github.cjengineer18.desktopwindowtemplate.dialog.JModalDialog;
 import io.github.cjengineer18.desktopwindowtemplate.exception.AsyncProcessException;
-import io.github.cjengineer18.desktopwindowtemplate.exception.UnknownAsyncProcessException;
 import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
 
 /**
@@ -45,58 +45,84 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  * 
  * @author Cristian Jimenez
  */
-public abstract class AsyncProcessLoading {
+public final class AsyncProcessLoading {
 
-	// The Thread Pool
-	private static final ExecutorService THE_POOL = Executors.newCachedThreadPool();
+	// The thread exception reference
+	private static final AtomicReference<Throwable> THREAD_ERROR = new AtomicReference<Throwable>();
+
+	// The threads counter
+	private static final AtomicLong COUNTER = new AtomicLong(0);
+
+	// The thread pool
+	private static final ExecutorService THE_POOL = Executors.newCachedThreadPool(new APLThreadFactory());
+
+	// The dialog
+	private static Dialog dialog;
+
+	private AsyncProcessLoading() {
+		throw new UnsupportedOperationException();
+	}
 
 	// Public methods
 
 	/**
 	 * Load asynchronously a process. A loading dialog will appear.
 	 * 
-	 * @param parent   A window parent. If {@code null}, a default frame is used.
-	 * @param runnable The process.
+	 * @param parent  A window parent. If {@code null}, a default frame is used.
+	 * @param process The process.
 	 * 
 	 * @throws AsyncProcessException If an {@link Exception} is thrown during the
 	 *                               async process.
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable runnable) throws AsyncProcessException {
+	public static void loadAsyncProcess(Window parent, IProcess process) throws AsyncProcessException {
 		ResourceBundle bundle = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 
-		loadAsyncProcess(parent, runnable, bundle.getString("loadingTitle"), bundle.getString("loadingMessage"));
+		loadAsyncProcess(parent, process, bundle.getString("loadingTitle"), bundle.getString("loadingMessage"));
 	}
 
 	/**
 	 * Load asynchronously a process. A loading dialog will appear.
 	 * 
-	 * @param parent   A window parent. If {@code null}, a default frame is used.
-	 * @param runnable The process.
-	 * @param message  A message that will appear in the loading dialog.
+	 * @param parent  A window parent. If {@code null}, a default frame is used.
+	 * @param process The process.
+	 * @param message A message that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException If an {@link Exception} is thrown during the
 	 *                               async process.
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable runnable, String message) throws AsyncProcessException {
+	public static void loadAsyncProcess(Window parent, IProcess process, String message) throws AsyncProcessException {
 		ResourceBundle bundle = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
 
-		loadAsyncProcess(parent, runnable, bundle.getString("loadingTitle"), message);
+		loadAsyncProcess(parent, process, bundle.getString("loadingTitle"), message);
 	}
 
 	/**
 	 * Load asynchronously a process. A loading dialog will appear.
 	 * 
-	 * @param parent   A window parent. If {@code null}, a default frame is used.
-	 * @param runnable The process.
-	 * @param title    A title for the dialog.
-	 * @param message  A message that will appear in the loading dialog.
+	 * @param parent  A window parent. If {@code null}, a default frame is used.
+	 * @param process The process.
+	 * @param title   A title for the dialog.
+	 * @param message A message that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException If an {@link Exception} is thrown during the
 	 *                               async process.
 	 */
-	public static void loadAsyncProcess(Window parent, Runnable runnable, String title, String message)
+	public static void loadAsyncProcess(Window parent, IProcess process, String title, String message)
 			throws AsyncProcessException {
-		loadAsyncProcess(parent, Executors.callable(runnable, true), title, message);
+		loadAsyncProcess(parent, new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					process.execute();
+				} catch (Exception exc) {
+					THREAD_ERROR.set(exc);
+				} finally {
+					dialog.dispose();
+				}
+			}
+
+		}, title, message);
 	}
 
 	// Private methods
@@ -105,44 +131,30 @@ public abstract class AsyncProcessLoading {
 	 * Load asynchronously a process. A loading dialog will appear.
 	 * 
 	 * @param parent  A window parent. If {@code null}, a default frame is used.
-	 * @param call    The callable representing the process.
+	 * @param invoker The runnable representing the process.
 	 * @param title   A title for the dialog.
 	 * @param message A message that will appear in the loading dialog.
 	 * 
 	 * @throws AsyncProcessException If an {@link Exception} is thrown during the
 	 *                               async process.
 	 */
-	private static void loadAsyncProcess(Window parent, Callable<Boolean> call, String title, String message)
+	private static void loadAsyncProcess(Window parent, Runnable invoker, String title, String message)
 			throws AsyncProcessException {
 		try {
-			AtomicReference<Throwable> threadException = new AtomicReference<Throwable>();
-			Dialog dialog = new Dialog(parent, title, message);
+			dialog = new Dialog(parent, title, message);
 
-			// Call in a "daemon" thread for prevent the main thread to lock.
-			THE_POOL.execute(() -> {
-				try {
-					THE_POOL.submit(call).get();
+			// Reset any older error
+			resetThreadError();
 
-					dialog.dispose();
-				} catch (InterruptedException | ExecutionException e) {
-					Throwable thw = e.getCause();
-
-					thw = thw instanceof RuntimeException ? thw.getCause() : thw;
-
-					if (thw == null) {
-						threadException.set(new UnknownAsyncProcessException());
-					} else {
-						threadException.set(thw);
-					}
-				}
-			});
+			// Execute the process
+			THE_POOL.execute(invoker);
 
 			// Show the dialog
 			dialog.setVisible(true);
 
 			// If an exception was thrown in the main thread, throw as a cause.
-			if (threadException.get() != null) {
-				throw new AsyncProcessException(threadException.get());
+			if (THREAD_ERROR.get() != null) {
+				throw new AsyncProcessException(THREAD_ERROR.get());
 			}
 		} catch (AsyncProcessException ape) {
 			throw ape;
@@ -151,9 +163,47 @@ public abstract class AsyncProcessLoading {
 		}
 	}
 
+	/**
+	 * Reset the thread error reference.
+	 */
+	private static void resetThreadError() {
+		THREAD_ERROR.set(null);
+	}
+
+	// Public classes
+
+	/* The executable function */
+	@FunctionalInterface
+	public interface IProcess {
+
+		void execute() throws Exception;
+
+	}
+
 	// Private classes
 
-	/* The Dialog */
+	/* The thread factory */
+	private static class APLThreadFactory implements ThreadFactory {
+
+		@Override
+		public Thread newThread(Runnable run) {
+			String id = String.format(Locale.ENGLISH, "%s-DaemonThread-%d", AsyncProcessLoading.class.getSimpleName(),
+					COUNTER.incrementAndGet());
+			Thread th = new Thread(run);
+
+			th.setDaemon(true);
+			th.setName(id);
+
+			th.setUncaughtExceptionHandler((th0, tw0) -> {
+				THREAD_ERROR.set(tw0);
+			});
+
+			return th;
+		}
+
+	}
+
+	/* The dialog */
 	private static class Dialog extends JModalDialog {
 
 		private static final long serialVersionUID = 1L;
@@ -176,7 +226,7 @@ public abstract class AsyncProcessLoading {
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
-			String[] cardinals = { BorderLayout.NORTH, BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST };
+			String[] cardinals = { BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST };
 
 			container.setLayout(new BorderLayout());
 			container.add(BorderLayout.CENTER, new WaitingPanel(message));

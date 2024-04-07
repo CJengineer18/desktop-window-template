@@ -47,6 +47,11 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  */
 public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
 
+	// Public constants
+
+	public static final int AT_INDETERMINATE = 0x01;
+	public static final int AT_CANCEL = 0x10;
+
 	// Fields
 
 	private Window parent;
@@ -69,7 +74,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @see AsyncProcessLoading
 	 */
 	public AsyncTask(Window parent) {
-		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingTitle"), 0, true, true);
+		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingTitle"), 0, 17);
 	}
 
 	/**
@@ -79,26 +84,25 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @param step   The progress step.
 	 */
 	public AsyncTask(Window parent, int step) {
-		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, false,
-				true);
+		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, 16);
 	}
 
 	/**
 	 * Creates a new async task.
 	 * 
-	 * @param parent        A window parent. If {@code null}, a default frame is
-	 *                      used.
-	 * @param title         A title for the dialog title.
-	 * @param step          The progress step.
-	 * @param indeterminate If {@code true}, disables progress monitoring.
-	 * @param enableCancel  If this process can be cancelled.
+	 * @param parent  A window parent. If {@code null}, a default frame is used.
+	 * @param title   A title for the dialog title.
+	 * @param step    The progress step.
+	 * @param options The options for the task. Only this options are accepted:
+	 *                {@link #AT_CANCEL}, {@link #AT_INDETERMINATE}. The options can
+	 *                be combined.
 	 */
-	public AsyncTask(Window parent, String title, int step, boolean indeterminate, boolean enableCancel) {
+	public AsyncTask(Window parent, String title, int step, int options) {
 		this.parent = parent;
 		this.step = step;
 		this.title = title;
-		this.enableCancel = enableCancel;
-		this.indeterminate = indeterminate;
+		this.enableCancel = (options & AT_CANCEL) != 0;
+		this.indeterminate = (options & AT_INDETERMINATE) != 0;
 	}
 
 	// Methods
@@ -129,6 +133,11 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	@Override
 	protected final void finish(Output result) {
 		dialog.dispose();
+
+		if (worker.hasError()) {
+			handleError(worker.getError());
+			return;
+		}
 
 		this.result = result;
 
@@ -193,7 +202,9 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
-			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this, false, enableCancel);
+			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this,
+					AcceptCancelDialogFooter.ACDF_CENTER_BUTTONS
+							| (enableCancel ? AcceptCancelDialogFooter.ACDF_CANCEL : 0));
 			String[] cardinals = { BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.WEST };
 
 			if (enableCancel) {
