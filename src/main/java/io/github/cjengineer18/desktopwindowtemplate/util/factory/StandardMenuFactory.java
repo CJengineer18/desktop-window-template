@@ -32,7 +32,10 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterEx
  * Factory for menus, either for a menu bar or for a sub-menu.
  * 
  * @author Cristian Jimenez
+ * 
+ * @deprecated Use {@code WindowMenuFactory}'s functions instead.
  */
+@Deprecated
 public abstract class StandardMenuFactory {
 
 	/** Indicates where's the separator. */
