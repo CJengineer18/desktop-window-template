@@ -30,6 +30,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
 import io.github.cjengineer18.desktopwindowtemplate.util.Utilities;
 
 /**
@@ -44,6 +45,11 @@ public abstract class JModalDialog extends JDialog {
 
 	private static final long serialVersionUID = 1311L;
 
+	/* Public Constants */
+
+	public static final int CENTER = 0;
+	public static final int TOP_LEFT = 1;
+
 	/* Protected Fields */
 
 	protected Window window;
@@ -52,6 +58,7 @@ public abstract class JModalDialog extends JDialog {
 
 	private Dimension originalSize;
 	private Dimension realSize;
+	private int location;
 
 	/**
 	 * Builds the dialog.
@@ -60,9 +67,22 @@ public abstract class JModalDialog extends JDialog {
 	 * @param title  The dialog title.
 	 */
 	public JModalDialog(Window window, String title) throws Exception {
+		this(window, title, TOP_LEFT);
+	}
+
+	/**
+	 * Builds the dialog.
+	 * 
+	 * @param window   The window parent.
+	 * @param title    The dialog title.
+	 * @param location The dialog location. Must be one of this constants:
+	 *                 {@code JModalDialog.CENTER}, {@code JModalDialog.TOP_LEFT}
+	 */
+	public JModalDialog(Window window, String title, int location) throws Exception {
 		super(window, title);
 
 		this.window = window;
+		this.location = location;
 	}
 
 	// Abstract methods
@@ -137,14 +157,31 @@ public abstract class JModalDialog extends JDialog {
 		originalSize = new Dimension(width, height);
 		realSize = Utilities.createWorkArea(originalSize);
 
+		int x;
+		int y;
+
 		setSize(realSize);
 		setPreferredSize(realSize);
-		setLocation(window.getX() + 10, window.getY() + 10);
 		setResizable(false);
 		setModal(true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setIconImages(window.getIconImages());
 		beforeLoadArea();
+
+		switch (location) {
+		case CENTER:
+			x = window.getX() + (int) ((window.getWidth() / 2) - (realSize.getWidth() / 2));
+			y = window.getY() + (int) ((window.getHeight() / 2) - (realSize.getHeight() / 2));
+			break;
+		case TOP_LEFT:
+			x = window.getX() + 10;
+			y = window.getY() + 10;
+			break;
+		default:
+			throw new InvalidParameterException("Unknown parameter for dialog location");
+		}
+
+		setLocation(x, y);
 
 		SwingUtilities.invokeLater(() -> {
 			try {

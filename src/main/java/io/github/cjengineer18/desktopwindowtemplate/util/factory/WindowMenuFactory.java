@@ -22,6 +22,7 @@
 package io.github.cjengineer18.desktopwindowtemplate.util.factory;
 
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +43,7 @@ public final class WindowMenuFactory {
 	}
 
 	/** Indicates where's the separator. */
-	public static final String SEPARATOR = "_separator";
+	public static final int SEPARATOR = 0xABC;
 
 	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
@@ -57,16 +58,39 @@ public final class WindowMenuFactory {
 	 * @return The new menu.
 	 */
 	public static JMenu createMenu(String label, List<Object> menuOptionLabels, ActionListener listener) {
+		return createMenu(label, menuOptionLabels, Collections.emptyMap(), listener);
+	}
+
+	/**
+	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
+	 * share the same listener for all options, whose functions will be defined by
+	 * {@code listener}.
+	 * 
+	 * @param label            The menu's name.
+	 * @param menuOptionLabels The menu's list. {@code null} elements will be
+	 *                         ignored.
+	 * @param keyStrokes       The key strokes for the options (only if
+	 *                         {@code menuOptionLabels}' keys are strings)
+	 * @param listener         The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JMenu createMenu(String label, List<Object> menuOptionLabels, Map<Object, Character> keyStrokes,
+			ActionListener listener) {
 		JMenu jm = new JMenu(label);
 
 		Objects.requireNonNull(menuOptionLabels, "The options must not be null");
 		Objects.requireNonNull(listener, "A global listener is required");
 
-		menuOptionLabels.stream().filter(e -> e != null).forEach(obj -> {
-			process(jm, obj, item -> {
+		menuOptionLabels.stream().filter(e -> e != null).forEach(optionLabel -> {
+			process(jm, optionLabel, item -> {
 				JMenuItem jmi = new JMenuItem(item.toString());
 
 				jmi.addActionListener(listener);
+
+				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
+					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				}
 
 				return jmi;
 			});
@@ -89,6 +113,26 @@ public final class WindowMenuFactory {
 	 * @return The new menu.
 	 */
 	public static JMenu createMenu(String label, Map<Object, String> menuOptions, ActionListener listener) {
+		return createMenu(label, menuOptions, Collections.emptyMap(), listener);
+	}
+
+	/**
+	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
+	 * share the same listener for all the options, whose functions will be defined
+	 * by {@code listener} and that will receive the commands defined in the
+	 * {@code menuOptions} values for each key.
+	 * 
+	 * @param label       The menu's name.
+	 * @param menuOptions The menu's list, each key represent a menu's element and
+	 *                    each value their command.
+	 * @param keyStrokes  The key strokes for the options (only if
+	 *                    {@code menuOptions}' keys are strings).
+	 * @param listener    The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JMenu createMenu(String label, Map<Object, String> menuOptions, Map<Object, Character> keyStrokes,
+			ActionListener listener) {
 		JMenu jm = new JMenu(label);
 
 		Objects.requireNonNull(menuOptions, "The options must not be null");
@@ -100,6 +144,10 @@ public final class WindowMenuFactory {
 
 				jmi.setActionCommand(command);
 				jmi.addActionListener(listener);
+
+				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
+					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				}
 
 				return jmi;
 			});
@@ -114,13 +162,32 @@ public final class WindowMenuFactory {
 	 * by {@code listener} and that will have it's own listeners defined in the
 	 * {@code menuOptions} values for each key.
 	 * 
-	 * @param label          The menu's name.
-	 * @param menuOptionsThe menu's list, each key represent a menu's element and
-	 *                       each value their listener
+	 * @param label       The menu's name.
+	 * @param menuOptions The menu's list, each key represent a menu's element and
+	 *                    each value their listener
 	 * 
 	 * @return The new menu.
 	 */
 	public static JMenu createMenu(String label, Map<Object, ActionListener> menuOptions) {
+		return createMenu(label, menuOptions, Collections.emptyMap());
+	}
+
+	/**
+	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
+	 * share the same listener for all the options, whose functions will be defined
+	 * by {@code listener} and that will have it's own listeners defined in the
+	 * {@code menuOptions} values for each key.
+	 * 
+	 * @param label       The menu's name.
+	 * @param menuOptions The menu's list, each key represent a menu's element and
+	 *                    each value their listener.
+	 * @param keyStrokes  The key strokes for the options (only if
+	 *                    {@code menuOptions}' keys are strings)
+	 * 
+	 * @return The new menu.
+	 */
+	public static JMenu createMenu(String label, Map<Object, ActionListener> menuOptions,
+			Map<Object, Character> keyStrokes) {
 		JMenu jm = new JMenu(label);
 
 		Objects.requireNonNull(menuOptions, "The options must not be null");
@@ -130,6 +197,10 @@ public final class WindowMenuFactory {
 				JMenuItem jmi = new JMenuItem(item.toString());
 
 				jmi.addActionListener(listener);
+
+				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
+					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				}
 
 				return jmi;
 			});

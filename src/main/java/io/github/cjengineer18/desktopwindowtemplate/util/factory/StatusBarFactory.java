@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,11 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.UnavailableCompone
  * 
  * @author cjengineer18
  */
-public abstract class StatusBarFactory {
+public final class StatusBarFactory {
+	
+	private StatusBarFactory() {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Create a status bar with the width, height, orientation and assigned

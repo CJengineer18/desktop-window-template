@@ -33,7 +33,12 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterEx
  * Factory to create popup menus.
  * 
  * @author Cristian Jimenez
+ * 
+ * @deprecated Use {@code WindowMenuFactory}'s functions instead.
+ * 
+ * @see WindowMenuFactory
  */
+@Deprecated
 public abstract class PopupMenuFactory {
 
 	/** Indicates where's the separator. */

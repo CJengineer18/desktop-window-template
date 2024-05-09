@@ -34,6 +34,8 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterEx
  * @author Cristian Jimenez
  * 
  * @deprecated Use {@code WindowMenuFactory}'s functions instead.
+ * 
+ * @see WindowMenuFactory
  */
 @Deprecated
 public abstract class StandardMenuFactory {

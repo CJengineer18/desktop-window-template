@@ -24,6 +24,7 @@ package io.github.cjengineer18.desktopwindowtemplate.async;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Window;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -206,7 +207,7 @@ public final class AsyncProcessLoading {
 		private String message;
 
 		Dialog(Window window, String title, String message) throws Exception {
-			super(window, title);
+			super(window, title, JModalDialog.CENTER);
 
 			this.message = message;
 
@@ -221,14 +222,13 @@ public final class AsyncProcessLoading {
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
-			String[] cardinals = { BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST };
 
 			container.setLayout(new BorderLayout());
 			container.add(BorderLayout.CENTER, new WaitingPanel(message));
 
-			for (String str : cardinals) {
-				container.add(str, new JPanel());
-			}
+			Arrays.asList(BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST).forEach(cardinal -> {
+				container.add(cardinal, new JPanel());
+			});
 		}
 
 	}
