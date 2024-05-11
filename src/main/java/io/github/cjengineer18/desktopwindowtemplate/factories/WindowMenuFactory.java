@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.github.cjengineer18.desktopwindowtemplate.util.factory;
+package io.github.cjengineer18.desktopwindowtemplate.factories;
 
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -30,6 +30,7 @@ import java.util.function.Function;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 /**
  * Factory for menus, either for a menu bar or for a sub-menu.
@@ -62,6 +63,23 @@ public final class WindowMenuFactory {
 	}
 
 	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all options, whose functions will be
+	 * defined by {@code listener}.
+	 * 
+	 * @param menuOptionLabels The menu's list. {@code null} elements will be
+	 *                         ignored.
+	 * @param listener         The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(List<Object> menuOptionLabels, ActionListener listener) {
+		JMenu dummyMenu = createMenu("dummy", menuOptionLabels, listener);
+
+		return dummyMenu.getPopupMenu();
+	}
+
+	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
 	 * share the same listener for all options, whose functions will be defined by
 	 * {@code listener}.
@@ -69,13 +87,13 @@ public final class WindowMenuFactory {
 	 * @param label            The menu's name.
 	 * @param menuOptionLabels The menu's list. {@code null} elements will be
 	 *                         ignored.
-	 * @param keyStrokes       The key strokes for the options (only if
+	 * @param menuMnemonics    The menu mnemonics for the options (only if
 	 *                         {@code menuOptionLabels}' keys are strings)
 	 * @param listener         The menu's global listener.
 	 * 
 	 * @return The new menu.
 	 */
-	public static JMenu createMenu(String label, List<Object> menuOptionLabels, Map<Object, Character> keyStrokes,
+	public static JMenu createMenu(String label, List<Object> menuOptionLabels, Map<Object, Character> menuMnemonics,
 			ActionListener listener) {
 		JMenu jm = new JMenu(label);
 
@@ -88,8 +106,8 @@ public final class WindowMenuFactory {
 
 				jmi.addActionListener(listener);
 
-				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
-					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				if (menuMnemonics.containsKey(optionLabel) && menuMnemonics.get(optionLabel) != null) {
+					jmi.setMnemonic(menuMnemonics.get(optionLabel));
 				}
 
 				return jmi;
@@ -97,6 +115,26 @@ public final class WindowMenuFactory {
 		});
 
 		return jm;
+	}
+
+	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all options, whose functions will be
+	 * defined by {@code listener}.
+	 * 
+	 * @param menuOptionLabels The menu's list. {@code null} elements will be
+	 *                         ignored.
+	 * @param menuMnemonics    The menu mnemonics for the options (only if
+	 *                         {@code menuOptionLabels}' keys are strings)
+	 * @param listener         The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(List<Object> menuOptionLabels, Map<Object, Character> menuMnemonics,
+			ActionListener listener) {
+		JMenu dummyMenu = createMenu("dummy", menuOptionLabels, menuMnemonics, listener);
+
+		return dummyMenu.getPopupMenu();
 	}
 
 	/**
@@ -117,21 +155,39 @@ public final class WindowMenuFactory {
 	}
 
 	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all the options, whose functions will
+	 * be defined by {@code listener} and that will receive the commands defined in
+	 * the {@code menuOptions} values for each key.
+	 * 
+	 * @param menuOptions The menu's list, each key represent a menu's element and
+	 *                    each value their command.
+	 * @param listener    The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(Map<Object, String> menuOptions, ActionListener listener) {
+		JMenu dummyMenu = createMenu("dummy", menuOptions, listener);
+
+		return dummyMenu.getPopupMenu();
+	}
+
+	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
 	 * share the same listener for all the options, whose functions will be defined
 	 * by {@code listener} and that will receive the commands defined in the
 	 * {@code menuOptions} values for each key.
 	 * 
-	 * @param label       The menu's name.
-	 * @param menuOptions The menu's list, each key represent a menu's element and
-	 *                    each value their command.
-	 * @param keyStrokes  The key strokes for the options (only if
-	 *                    {@code menuOptions}' keys are strings).
-	 * @param listener    The menu's global listener.
+	 * @param label         The menu's name.
+	 * @param menuOptions   The menu's list, each key represent a menu's element and
+	 *                      each value their command.
+	 * @param menuMnemonics The menu mnemonics for the options (only if
+	 *                      {@code menuOptions}' keys are strings).
+	 * @param listener      The menu's global listener.
 	 * 
 	 * @return The new menu.
 	 */
-	public static JMenu createMenu(String label, Map<Object, String> menuOptions, Map<Object, Character> keyStrokes,
+	public static JMenu createMenu(String label, Map<Object, String> menuOptions, Map<Object, Character> menuMnemonics,
 			ActionListener listener) {
 		JMenu jm = new JMenu(label);
 
@@ -145,8 +201,8 @@ public final class WindowMenuFactory {
 				jmi.setActionCommand(command);
 				jmi.addActionListener(listener);
 
-				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
-					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				if (menuMnemonics.containsKey(optionLabel) && menuMnemonics.get(optionLabel) != null) {
+					jmi.setMnemonic(menuMnemonics.get(optionLabel));
 				}
 
 				return jmi;
@@ -154,6 +210,27 @@ public final class WindowMenuFactory {
 		});
 
 		return jm;
+	}
+
+	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all the options, whose functions will
+	 * be defined by {@code listener} and that will receive the commands defined in
+	 * the {@code menuOptions} values for each key.
+	 * 
+	 * @param menuOptions   The menu's list, each key represent a menu's element and
+	 *                      each value their command.
+	 * @param menuMnemonics The menu mnemonics for the options (only if
+	 *                      {@code menuOptions}' keys are strings).
+	 * @param listener      The menu's global listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(Map<Object, String> menuOptions, Map<Object, Character> menuMnemonics,
+			ActionListener listener) {
+		JMenu dummyMenu = createMenu("dummy", menuOptions, menuMnemonics, listener);
+
+		return dummyMenu.getPopupMenu();
 	}
 
 	/**
@@ -173,21 +250,38 @@ public final class WindowMenuFactory {
 	}
 
 	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all the options, whose functions will
+	 * be defined by {@code listener} and that will have it's own listeners defined
+	 * in the {@code menuOptions} values for each key.
+	 * 
+	 * @param menuOptions The menu's list, each key represent a menu's element and
+	 *                    each value their listener.
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(Map<Object, ActionListener> menuOptions) {
+		JMenu dummyMenu = createMenu("dummy", menuOptions);
+
+		return dummyMenu.getPopupMenu();
+	}
+
+	/**
 	 * Create a menu ready to use in a menu bar or in a sub-menu. This menu will
 	 * share the same listener for all the options, whose functions will be defined
 	 * by {@code listener} and that will have it's own listeners defined in the
 	 * {@code menuOptions} values for each key.
 	 * 
-	 * @param label       The menu's name.
-	 * @param menuOptions The menu's list, each key represent a menu's element and
-	 *                    each value their listener.
-	 * @param keyStrokes  The key strokes for the options (only if
-	 *                    {@code menuOptions}' keys are strings)
+	 * @param label         The menu's name.
+	 * @param menuOptions   The menu's list, each key represent a menu's element and
+	 *                      each value their listener.
+	 * @param menuMnemonics The menu mnemonics for the options (only if
+	 *                      {@code menuOptions}' keys are strings)
 	 * 
 	 * @return The new menu.
 	 */
 	public static JMenu createMenu(String label, Map<Object, ActionListener> menuOptions,
-			Map<Object, Character> keyStrokes) {
+			Map<Object, Character> menuMnemonics) {
 		JMenu jm = new JMenu(label);
 
 		Objects.requireNonNull(menuOptions, "The options must not be null");
@@ -198,8 +292,8 @@ public final class WindowMenuFactory {
 
 				jmi.addActionListener(listener);
 
-				if (keyStrokes.containsKey(optionLabel) && keyStrokes.get(optionLabel) != null) {
-					jmi.setMnemonic(keyStrokes.get(optionLabel));
+				if (menuMnemonics.containsKey(optionLabel) && menuMnemonics.get(optionLabel) != null) {
+					jmi.setMnemonic(menuMnemonics.get(optionLabel));
 				}
 
 				return jmi;
@@ -208,6 +302,28 @@ public final class WindowMenuFactory {
 
 		return jm;
 	}
+
+	/**
+	 * Create a popup menu ready to use as a context menu for any component. This
+	 * menu will share the same listener for all the options, whose functions will
+	 * be defined by {@code listener} and that will have it's own listeners defined
+	 * in the {@code menuOptions} values for each key.
+	 * 
+	 * @param menuOptions   The menu's list, each key represent a menu's element and
+	 *                      each value their listener.
+	 * @param menuMnemonics The menu mnemonics for the options (only if
+	 *                      {@code menuOptions}' keys are strings)
+	 * 
+	 * @return The new menu.
+	 */
+	public static JPopupMenu createPopupMenu(Map<Object, ActionListener> menuOptions,
+			Map<Object, Character> menuMnemonics) {
+		JMenu dummyMenu = createMenu("dummy", menuOptions, menuMnemonics);
+
+		return dummyMenu.getPopupMenu();
+	}
+
+	// Private methods
 
 	/**
 	 * Process the menu.

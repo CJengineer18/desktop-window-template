@@ -30,7 +30,9 @@ import io.github.cjengineer18.desktopwindowtemplate.JGenericWindow;
  * 
  * @author Cristian Jimenez Dzg
  *
+ * @deprecated Useless
  */
+@Deprecated
 public class InvalidParameterException extends Exception {
 
 	private static final long serialVersionUID = 0xABCDL;

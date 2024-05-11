@@ -35,7 +35,7 @@ import io.github.cjengineer18.desktopwindowtemplate.JGenericWindow;
  */
 public class InvalidCommandException extends Exception {
 
-	private static final long serialVersionUID = 0x1234L;
+	private static final long serialVersionUID = 0x13E3;
 
 	public InvalidCommandException() {
 		super("Invalid Command or Error in Command");

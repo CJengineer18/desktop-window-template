@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,11 @@ import java.awt.Toolkit;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -37,8 +38,7 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidCommandException;
-import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
 import io.github.cjengineer18.desktopwindowtemplate.util.Utilities;
 
 /**
@@ -53,13 +53,14 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 
 	/* Private Constants */
 
-	private static final long serialVersionUID = 68482L;
-	private static final Dimension minimumSize = new Dimension(200, 200);
+	private static final long serialVersionUID = 13;
+
+	private static final Dimension MIN_WINDOW_SIZE = new Dimension(200, 200);
 
 	/* Private Fields */
 
-	private LinkedList<WindowListener> listeners1;
-	private LinkedList<WindowStateListener> listeners2;
+	private LinkedList<WindowListener> windowListeners;
+	private LinkedList<WindowStateListener> windowStateListeners;
 	private Dimension originalSize;
 	private Dimension realSize;
 
@@ -89,8 +90,8 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	public JGenericWindow() {
 		super();
 
-		listeners1 = new LinkedList<WindowListener>();
-		listeners2 = new LinkedList<WindowStateListener>();
+		windowListeners = new LinkedList<WindowListener>();
+		windowStateListeners = new LinkedList<WindowStateListener>();
 	}
 
 	// Abstract methods
@@ -99,35 +100,10 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	// the application.
 
 	/**
-	 * Universal getter for any window property.
-	 * 
-	 * @param objectIndex
-	 *            Object index. It must be a constant. If the index doesn't
-	 *            match any object, this method returns {@code null}.
-	 * 
-	 * @return The required object.
-	 */
-	public abstract Object singleGetter(int objectIndex);
-
-	/**
-	 * Universal setter for any window's object.
-	 * 
-	 * @param objectIndex
-	 *            Object index. It must be a constant.
-	 * @param newObject
-	 *            The new object to assign.
-	 * 
-	 * @throws InvalidCommandException
-	 *             If {@code objectIndex} doesn't match any valid index.
-	 */
-	public abstract void singleSetter(int objectIndex, Object newObject) throws InvalidCommandException;
-
-	/**
 	 * Here's all the window build. This method is invoked from
 	 * {@code loadWorkArea(String, int, int, boolean, int)}.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
@@ -138,13 +114,11 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	// developer's choice override them.
 
 	/**
-	 * This method does any necessary action before create and show the window.
-	 * This method is invoked from
-	 * {@code loadWorkArea(String, int, int, boolean, int)}. By default, this
-	 * method does nothing, but can be override.
+	 * This method does any necessary action before create and show the window. This
+	 * method is invoked from {@code loadWorkArea(String, int, int, boolean, int)}.
+	 * By default, this method does nothing, but can be override.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
@@ -153,13 +127,11 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	}
 
 	/**
-	 * This method does any necessary action after create and show the window.
-	 * This method is invoked from
-	 * {@code loadWorkArea(String, int, int, boolean, int)}. By default, this
-	 * method does nothing, but can be override.
+	 * This method does any necessary action after create and show the window. This
+	 * method is invoked from {@code loadWorkArea(String, int, int, boolean, int)}.
+	 * By default, this method does nothing, but can be override.
 	 * 
-	 * @throws Exception
-	 *             If any error.
+	 * @throws Exception If any error.
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
@@ -219,37 +191,24 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	}
 
 	/**
-	 * Invoke <b>only</b> inside the builder. Here an empty frame is created
-	 * with the required specifications and filled as implemented by
-	 * {@code beforeLoadArea()} and {@code workArea()}. Now the window position
-	 * will be the center of the screen.
+	 * Invoke <b>only</b> inside the builder. Here an empty frame is created with
+	 * the required specifications and filled as implemented by
+	 * {@code beforeLoadArea()} and {@code workArea()}. Now the window position will
+	 * be the center of the screen.
 	 * 
-	 * @param title
-	 *            Window title.
-	 * @param width
-	 *            Window width. The minimum must be 200px.
-	 * @param height
-	 *            Window height. The minimum must be 200px.
-	 * @param fixedWindow
-	 *            Will the window be fixed size?
-	 * @param typeClosingWindow
-	 *            How should the window be closed?. Only one of three
-	 *            constants:<br>
-	 *            <ul>
-	 *            <li>{@code NO_CONFIRM_AT_CLOSE}</li>
-	 *            <li>{@code CONFIRM_AT_CLOSE}</li>
-	 *            <li>{@code CLOSE_NOT_MAIN_WINDOW}</li>
-	 *            </ul>
+	 * @param title             Window title.
+	 * @param width             Window width. The minimum must be 200px.
+	 * @param height            Window height. The minimum must be 200px.
+	 * @param fixedWindow       Will the window be fixed size?
+	 * @param typeClosingWindow How should the window be closed?. Only one of three
+	 *                          constants:<br>
+	 *                          <ul>
+	 *                          <li>{@code NO_CONFIRM_AT_CLOSE}</li>
+	 *                          <li>{@code CONFIRM_AT_CLOSE}</li>
+	 *                          <li>{@code CLOSE_NOT_MAIN_WINDOW}</li>
+	 *                          </ul>
 	 * 
 	 * @throws Exception
-	 *             <ul>
-	 *             <li>({@link InvalidParameterException}) If the width or
-	 *             height are less than the minimal, the title is null or the
-	 *             value in {@code typeClosingWindow} doesn't match any of the
-	 *             constants.</li>
-	 *             <li>({@link Exception}) Some other exception defined by the
-	 *             developer.</li>
-	 *             </ul>
 	 * 
 	 * @see #NO_CONFIRM_AT_CLOSE
 	 * @see #CONFIRM_AT_CLOSE
@@ -260,11 +219,15 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void loadWorkArea(String title, int width, int height, boolean fixedWindow, int typeClosingWindow)
 			throws Exception {
+		AtomicReference<Exception> asyncException = new AtomicReference<Exception>();
+
 		Dimension screen;
 		int x;
 		int y;
 
-		if (((width >= minimumSize.getWidth()) && (height >= minimumSize.getHeight())) && (title != null)) {
+		title = Objects.requireNonNull(title);
+
+		if (((width >= MIN_WINDOW_SIZE.getWidth()) && (height >= MIN_WINDOW_SIZE.getHeight())) && (title != null)) {
 			screen = Toolkit.getDefaultToolkit().getScreenSize();
 
 			originalSize = new Dimension(width, height);
@@ -294,7 +257,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 				break;
 			// ERROR! None of the 3!
 			default:
-				throw new InvalidParameterException(
+				throw new ComponentBuildException(
 						String.format(Locale.ENGLISH, "typeClosingWindow = %d?", typeClosingWindow));
 			}
 
@@ -305,76 +268,43 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 					setVisible(true);
 					executeAfterLoadArea();
 				} catch (Exception exc) {
-					Logger.getLogger(JGenericWindow.class.getName()).log(Level.SEVERE, exc.getMessage(), exc);
+					asyncException.set(exc);
 				}
 			});
-		} else {
-			if ((width <= 0) || (height <= 0)) {
-				throw new InvalidParameterException(
-						String.format(Locale.ENGLISH, "Wrong size => (width = %d, height = %d)", width, height));
-			} else if (title == null) {
-				throw new InvalidParameterException(new NullPointerException("title"));
+
+			if (asyncException.get() != null) {
+				throw asyncException.get();
 			}
+		} else if ((width <= 0) || (height <= 0)) {
+			throw new ComponentBuildException(
+					String.format(Locale.ENGLISH, "Wrong size => (width = %d, height = %d)", width, height));
 		}
 	}
 
 	/**
 	 * Add the listener to the window.
 	 * 
-	 * @param listeners
-	 *            Objects which listen the window changes.
+	 * @param listeners Objects which listen the window changes.
 	 * 
-	 * @throws InvalidParameterException
-	 *             if {@code listeners} is {@code null}.
 	 * 
 	 * @see #enableListeners()
 	 */
-	protected final void addListeners(WindowListener... listeners) throws InvalidParameterException {
-		if (listeners != null) {
-			if (listeners.length > 0) {
-				for (WindowListener wl : listeners) {
-					if (wl != null) {
-						listeners1.add(wl);
-					} else {
-						Logger.getLogger(JGenericWindow.class.getName()).log(Level.WARNING,
-								"A listener is null. Ignoring...");
-					}
-				}
-			} else {
-				throw new InvalidParameterException("No listeners to add!");
-			}
-		} else {
-			throw new InvalidParameterException(new NullPointerException());
+	protected final void addListeners(WindowListener... listeners) {
+		if (listeners != null && listeners.length > 0) {
+			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(l -> windowListeners.add(l));
 		}
 	}
 
 	/**
 	 * Add the listener to the window.
 	 * 
-	 * @param listeners
-	 *            Objects which listen the window changes.
-	 * 
-	 * @throws InvalidParameterException
-	 *             if {@code listeners} is {@code null}.
+	 * @param listeners Objects which listen the window changes.
 	 * 
 	 * @see #enableListeners()
 	 */
-	protected final void addListeners(WindowStateListener... listeners) throws InvalidParameterException {
-		if (listeners != null) {
-			if (listeners.length != 0) {
-				for (WindowStateListener wsl : listeners) {
-					if (wsl != null) {
-						listeners2.add(wsl);
-					} else {
-						Logger.getLogger(JGenericWindow.class.getName()).log(Level.WARNING,
-								"An listener is null. Ignoring...");
-					}
-				}
-			} else {
-				throw new InvalidParameterException("No listeners to add!");
-			}
-		} else {
-			throw new InvalidParameterException(new NullPointerException());
+	protected final void addListeners(WindowStateListener... listeners) {
+		if (listeners != null && listeners.length > 0) {
+			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(l -> windowStateListeners.add(l));
 		}
 	}
 
@@ -387,54 +317,29 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void enableListeners() {
 		SwingUtilities.invokeLater(() -> {
-			if (!listeners1.isEmpty()) {
-				for (WindowListener wl : listeners1) {
-					addWindowListener(wl);
-				}
-			}
-
-			if (!listeners2.isEmpty()) {
-				for (WindowStateListener wsl : listeners2) {
-					addWindowStateListener(wsl);
-				}
-			}
+			windowListeners.forEach(l -> addWindowListener(l));
+			windowStateListeners.forEach(l -> addWindowStateListener(l));
 		});
 	}
 
 	/**
 	 * Create and add a menu bar for the current window.
 	 * 
-	 * @param menus
-	 *            The menus which will be in the window.
-	 * 
-	 * @return {@code true} if the menu was added successfully, {@code false}
-	 *         otherwise.
+	 * @param menus The menus which will be in the window.
 	 */
-	protected final boolean insertMainMenuBar(JMenu... menus) {
-		boolean success = true;
-
+	protected final void insertMainMenuBar(JMenu... menus) {
 		if ((menus != null) && (menus.length > 0)) {
 			JMenuBar jmb = new JMenuBar();
 
-			for (JMenu jm : menus) {
-				if (jm != null) {
-					jmb.add(jm);
-				}
-			}
+			Arrays.asList(menus).stream().filter(m -> m != null).forEach(m -> jmb.add(m));
 
-			if (success) {
-				setJMenuBar(jmb);
-			}
-		} else {
-			success = false;
+			setJMenuBar(jmb);
 		}
-
-		return success;
 	}
 
 	/**
-	 * Maximize the window. This only has an effect when the window doesn't have
-	 * a fixed size.
+	 * Maximize the window. This only has an effect when the window doesn't have a
+	 * fixed size.
 	 * 
 	 * @see #maximizeWindowFromOutside()
 	 * @see #loadWorkArea(String, int, int, boolean, int)
@@ -452,7 +357,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * Adjust the minimum size to the minimum tolerable size.
 	 */
 	private void tolerableMinimumSize() {
-		setMinimumSize(Utilities.createWorkArea(minimumSize));
+		setMinimumSize(Utilities.createWorkArea(MIN_WINDOW_SIZE));
 	}
 
 	// Execute before the window loaded and show.

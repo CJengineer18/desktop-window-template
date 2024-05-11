@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.github.cjengineer18.desktopwindowtemplate.util.factory;
+package io.github.cjengineer18.desktopwindowtemplate.factories;
 
 import java.awt.event.ActionListener;
 

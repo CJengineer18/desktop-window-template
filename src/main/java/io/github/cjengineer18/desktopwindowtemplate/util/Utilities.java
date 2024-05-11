@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,16 +31,18 @@ import javax.swing.JFrame;
  * 
  * @author CJengineer18
  */
-public abstract class Utilities {
+public final class Utilities {
+
+	private Utilities() {
+		throw new UnsupportedOperationException();
+	}
 
 	/**
 	 * Create the work area for the window according to the current OS.
 	 * 
-	 * @param originalSize
-	 *            The original size of the window.
+	 * @param originalSize The original size of the window.
 	 * 
-	 * @return An {@code Dimension} object with the calculated size based on the
-	 *         OS.
+	 * @return An {@code Dimension} object with the calculated size based on the OS.
 	 */
 	public static Dimension createWorkArea(Dimension originalSize) {
 		JFrame dummy = new JFrame();
@@ -58,17 +60,16 @@ public abstract class Utilities {
 
 		// FIXME Insets Management
 		/*
-		 * Some OS restrict the actual workspace to assign them to the border
-		 * and the title bar. Depending on the OS, we compensate for the missing
-		 * part by adding the border size to the area.
+		 * Some OS restrict the actual workspace to assign them to the border and the
+		 * title bar. Depending on the OS, we compensate for the missing part by adding
+		 * the border size to the area.
 		 */
 
 		if (os.contains("Windows")) {
 			// FIXME Windows insets
 			/*
-			 * Windows adds 2 extra pixels to the borders, causing some errors
-			 * in custom graphics (like games). However, this can change between
-			 * Windows versions.
+			 * Windows adds 2 extra pixels to the borders, causing some errors in custom
+			 * graphics (like games). However, this can change between Windows versions.
 			 */
 			insetValues[0] = insets.top - 2;
 			insetValues[1] = insets.left - 2;

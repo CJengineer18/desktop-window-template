@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.Arrays;
 import java.util.Locale;
 
 import javax.swing.BorderFactory;
@@ -33,7 +34,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
 import io.github.cjengineer18.desktopwindowtemplate.exception.UnavailableComponentException;
 
 /**
@@ -43,23 +44,20 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.UnavailableCompone
  */
 public class JStatusBar extends JPanel {
 
-	private static final long serialVersionUID = 86442222L;
+	private static final long serialVersionUID = 0x13C2;
 
 	/**
 	 * Create a status bar with the width, height and the components to add.
 	 * 
-	 * @param width
-	 *            The width.
-	 * @param height
-	 *            The height.
-	 * @param components
-	 *            The components which will be in the bar.
+	 * @param width      The width.
+	 * @param height     The height.
+	 * @param components The components which will be in the bar.
 	 * 
-	 * @throws InvalidParameterException
-	 *             If some of the parameters are invalid.
+	 * @throws ComponentBuildException If some of the parameters are invalid.
 	 */
-	public JStatusBar(int width, int height, Component[] components) throws InvalidParameterException {
-		super();
+	public JStatusBar(int width, int height, Component[] components) throws ComponentBuildException {
+		super(new BorderLayout());
+
 		createDefaultStatusBar(width, height, components);
 	}
 
@@ -68,37 +66,35 @@ public class JStatusBar extends JPanel {
 	 * 
 	 * @return The {@link JPanel} with the content of the bar.
 	 * 
-	 * @throws UnavailableComponentException
-	 *             If the component can't be extracted.
+	 * @throws UnavailableComponentException If the component can't be extracted.
 	 * 
 	 * @see #setContentSection(JPanel)
 	 */
 	public final JPanel getContentSection() throws UnavailableComponentException {
 		try {
 			return (JPanel) getComponent(4);
-		} catch (ArrayIndexOutOfBoundsException aioobe) {
-			throw new UnavailableComponentException(aioobe);
+		} catch (Exception exc) {
+			throw new UnavailableComponentException(exc);
 		}
 	}
 
 	/**
 	 * Replace the content panel with the new one.
 	 * 
-	 * @param contentSection
-	 *            The new content.
+	 * @param contentSection The new content.
 	 * 
-	 * @throws InvalidParameterException
-	 *             If {@code contentSection} don't meet to be added the bar or
-	 *             some other internal error.
+	 * @throws UnavailableComponentException If {@code contentSection} don't meet to
+	 *                                       be added the bar or some other internal
+	 *                                       error.
 	 * 
 	 * @see #getContentSection()
 	 */
-	public final void setContentSection(JPanel contentSection) throws InvalidParameterException {
+	public final void setContentSection(JPanel contentSection) throws UnavailableComponentException {
 		try {
 			remove(4);
 			add(contentSection);
-		} catch (ArrayIndexOutOfBoundsException aioobe) {
-			throw new InvalidParameterException(aioobe);
+		} catch (Exception exc) {
+			throw new UnavailableComponentException(exc);
 		}
 	}
 
@@ -107,61 +103,65 @@ public class JStatusBar extends JPanel {
 	 * 
 	 * @return The last panel.
 	 * 
-	 * @throws UnavailableComponentException
-	 *             If the panel can't be extracted.
+	 * @throws UnavailableComponentException If the panel can't be extracted.
 	 */
 	public final JPanel extractLastPanel() throws UnavailableComponentException {
 		try {
 			JPanel content = getContentSection();
+
 			return (JPanel) content.getComponent(content.getComponentCount() - 1);
-		} catch (ArrayIndexOutOfBoundsException aioobe) {
-			throw new UnavailableComponentException("This status bar doesn't have a empty last panel!", aioobe);
-		} catch (NullPointerException npe) {
-			throw new UnavailableComponentException(npe);
+		} catch (Exception exc) {
+			throw new UnavailableComponentException(exc);
 		}
 	}
 
 	private final void createDefaultStatusBar(int width, int height, Component[] components)
-			throws InvalidParameterException {
+			throws ComponentBuildException {
 		if ((components != null) && ((width > 0) && (height > 0))) {
 			JPanel statusBar = new JPanel();
 			JPanel lastPanel = new JPanel();
-			JPanel[] fragments = new JPanel[components.length];
+
 			statusBar.setLayout(new BoxLayout(statusBar, BoxLayout.X_AXIS));
 			statusBar.setPreferredSize(new Dimension(width, height));
 			lastPanel.setBorder(BorderFactory.createLoweredBevelBorder());
-			setLayout(new BorderLayout());
+
 			setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK));
-			for (int i = 0; i < components.length; i++) {
-				if (components[i] != null) {
-					fragments[i] = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-					fragments[i].setBorder(BorderFactory.createLoweredBevelBorder());
-					fragments[i].add(components[i]);
-					statusBar.add(fragments[i]);
-					statusBar.add(Box.createRigidArea(new Dimension(4, height)));
-				} else
-					throw new NullPointerException(String.format(Locale.ENGLISH, "components[%d]", i));
-			}
+
+			Arrays.asList(components).stream().filter(c -> c != null).forEach(c -> {
+				JPanel fragment = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+				fragment.setBorder(BorderFactory.createLoweredBevelBorder());
+				fragment.add(c);
+
+				statusBar.add(fragment);
+				statusBar.add(Box.createRigidArea(new Dimension(4, height)));
+			});
+
 			statusBar.add(lastPanel);
-			add(padding(), BorderLayout.NORTH); // 0
-			add(padding(), BorderLayout.SOUTH); // 1
-			add(padding(), BorderLayout.EAST); // 2
-			add(padding(), BorderLayout.WEST); // 3
-			add(statusBar, BorderLayout.CENTER); // 4
+
+			Arrays.asList(BorderLayout.NORTH, BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST)
+					.forEach(cardinal -> {
+						add(cardinal, padding());
+					});
+
+			add(statusBar, BorderLayout.CENTER);
+		} else if (components == null) {
+			throw new ComponentBuildException("Components cannot be null");
+		} else if ((width <= 0) || (height <= 0)) {
+			throw new ComponentBuildException(
+					String.format(Locale.ENGLISH, "Wrong size => (width = %d, height = %d)", width, height));
 		} else {
-			if (components == null)
-				throw new InvalidParameterException(new NullPointerException());
-			else if ((width <= 0) || (height <= 0))
-				throw new InvalidParameterException(
-						String.format(Locale.ENGLISH, "Wrong size => (width = %d, height = %d)", width, height));
-			else
-				throw new InvalidParameterException("Unknown error");
+			throw new ComponentBuildException("Unknown error");
 		}
 	}
 
+	// Private methods
+
 	private static JPanel padding() {
 		JPanel panel = new JPanel();
+
 		panel.setPreferredSize(new Dimension(2, 2));
+
 		return panel;
 	}
 

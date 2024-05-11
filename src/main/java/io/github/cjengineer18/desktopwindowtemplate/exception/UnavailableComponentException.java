@@ -34,7 +34,7 @@ import io.github.cjengineer18.desktopwindowtemplate.component.JStatusBar;
  */
 public class UnavailableComponentException extends Exception {
 
-	private static final long serialVersionUID = 14L;
+	private static final long serialVersionUID = 0x13E4;
 
 	public UnavailableComponentException(Object error, Throwable exc) {
 		super("Unavailable Component" + error.toString(), exc);

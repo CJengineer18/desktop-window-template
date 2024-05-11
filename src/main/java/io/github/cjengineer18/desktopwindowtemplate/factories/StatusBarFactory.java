@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.github.cjengineer18.desktopwindowtemplate.util.factory;
+package io.github.cjengineer18.desktopwindowtemplate.factories;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -31,7 +31,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import io.github.cjengineer18.desktopwindowtemplate.component.JStatusBar;
-import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
 import io.github.cjengineer18.desktopwindowtemplate.exception.UnavailableComponentException;
 
 /**
@@ -40,45 +40,41 @@ import io.github.cjengineer18.desktopwindowtemplate.exception.UnavailableCompone
  * @author cjengineer18
  */
 public final class StatusBarFactory {
-	
+
 	private StatusBarFactory() {
 		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * Create a status bar with the width, height, orientation and assigned
-	 * content.
+	 * Create a status bar with the width, height, orientation and assigned content.
 	 * 
 	 * @param width
 	 * @param height
-	 * @param rightToLeft
-	 *            {@code true} so that the order of the components is from right
-	 *            to left.
+	 * @param rightToLeft {@code true} so that the order of the components is from
+	 *                    right to left.
 	 * @param components
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case some parameter does not comply and / or some internal
-	 *             error.
+	 * @throws ComponentBuildException
+	 * @throws UnavailableComponentException
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, int, Component...)
 	 * @see #createStatusBar(int, boolean, Component...)
 	 */
 	public static JStatusBar createStatusBar(int width, int height, boolean rightToLeft, Component... components)
-			throws InvalidParameterException {
-		try {
-			JStatusBar statusBar = createStatusBar(width, height, components);
-			if (rightToLeft) {
-				JPanel content = statusBar.getContentSection();
-				content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
-				content.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-				statusBar.setContentSection(content);
-			}
-			return statusBar;
-		} catch (UnavailableComponentException uce) {
-			throw new InvalidParameterException(uce);
+			throws ComponentBuildException, UnavailableComponentException {
+		JStatusBar statusBar = createStatusBar(width, height, components);
+
+		if (rightToLeft) {
+			JPanel content = statusBar.getContentSection();
+
+			content.setLayout(new BoxLayout(content, BoxLayout.LINE_AXIS));
+			content.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+			statusBar.setContentSection(content);
 		}
+
+		return statusBar;
 	}
 
 	/**
@@ -87,21 +83,18 @@ public final class StatusBarFactory {
 	 * 
 	 * @param width
 	 * @param height
-	 * @param components
-	 *            .
+	 * @param components .
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case some parameter does not comply and / or some internal
-	 *             error.
+	 * @throws ComponentBuildException
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, boolean, Component...)
 	 * @see #createStatusBar(int, int, boolean, Component...)
 	 */
 	public static JStatusBar createStatusBar(int width, int height, Component... components)
-			throws InvalidParameterException {
+			throws ComponentBuildException {
 		return new JStatusBar(width, height, components);
 	}
 
@@ -110,118 +103,108 @@ public final class StatusBarFactory {
 	 * default height is 20px.
 	 * 
 	 * @param width
-	 * @param rightToLeft
-	 *            {@code true} so that the order of the components is from right
-	 *            to left.
+	 * @param rightToLeft {@code true} so that the order of the components is from
+	 *                    right to left.
 	 * @param components
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case some parameter does not comply and / or some internal
-	 *             error.
+	 * @throws ComponentBuildException
+	 * @throws UnavailableComponentException
 	 * 
 	 * @see #createStatusBar(int, Component...)
 	 * @see #createStatusBar(int, int, Component...)
 	 * @see #createStatusBar(int, int, boolean, Component...)
 	 */
 	public static JStatusBar createStatusBar(int width, boolean rightToLeft, Component... components)
-			throws InvalidParameterException {
+			throws ComponentBuildException, UnavailableComponentException {
 		return createStatusBar(width, 20, rightToLeft, components);
 	}
 
 	/**
-	 * Create a status bar with the width and content assigned. The default
-	 * height is 20px. The orientation will be from left to right.
+	 * Create a status bar with the width and content assigned. The default height
+	 * is 20px. The orientation will be from left to right.
 	 * 
 	 * @param width
 	 * @param components
 	 * 
 	 * @return A {@link JStatusBar} ready to use.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case some parameter does not comply and / or some internal
-	 *             error.
+	 * @throws ComponentBuildException
 	 * 
 	 * @see #createStatusBar(int, int, Component...)
 	 * @see #createStatusBar(int, boolean, Component...)
 	 * @see #createStatusBar(int, int, boolean, Component...)
 	 */
-	public static JStatusBar createStatusBar(int width, Component... components) throws InvalidParameterException {
+	public static JStatusBar createStatusBar(int width, Component... components) throws ComponentBuildException {
 		return createStatusBar(width, 20, components);
 	}
 
 	/**
-	 * Create an empty status bar with the width and height assigned ready to
-	 * use.
+	 * Create an empty status bar with the width and height assigned ready to use.
 	 * 
 	 * @param width
 	 * @param height
 	 * 
 	 * @return A empty {@link JStatusBar}.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case of internal error.
+	 * @throws ComponentBuildException
 	 * 
 	 * @see #createEmptyStatusBar(int)
 	 */
-	public static JStatusBar createEmptyStatusBar(int width, int height) throws InvalidParameterException {
+	public static JStatusBar createEmptyStatusBar(int width, int height) throws ComponentBuildException {
 		return createStatusBar(width, height, new Component[0]);
 	}
 
 	/**
-	 * Create an empty status bar with the assigned width ready to use. The
-	 * default height is 20px.
+	 * Create an empty status bar with the assigned width ready to use. The default
+	 * height is 20px.
 	 * 
 	 * @param width
 	 * 
 	 * @return A empty {@link JStatusBar}.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case of internal error.
+	 * @throws ComponentBuildException
 	 * 
 	 * @see #createEmptyStatusBar(int, int)
 	 */
-	public static JStatusBar createEmptyStatusBar(int width) throws InvalidParameterException {
+	public static JStatusBar createEmptyStatusBar(int width) throws ComponentBuildException {
 		return createStatusBar(width, 20, new Component[0]);
 	}
 
 	/**
 	 * Insert a component to the last panel of the status bar to modify.
 	 * 
-	 * @param statusBar
-	 *            Status bar to modify.
-	 * @param component
-	 *            The component to add.
+	 * @param statusBar Status bar to modify.
+	 * @param component The component to add.
 	 * 
 	 * @return The same status bar.
 	 * 
-	 * @throws InvalidParameterException
-	 *             In case {@code statusBar} or {@code component} are
-	 *             {@code null} or if the component to be modified is not
-	 *             available in the bar.
+	 * @throws ComponentBuildException
+	 * @throws UnavailableComponentException
 	 */
 	public static JStatusBar insertComponentToLastPanel(JStatusBar statusBar, Component component)
-			throws InvalidParameterException {
-		try {
-			JPanel lastPanel = statusBar.extractLastPanel();
-			lastPanel.setLayout(new BorderLayout());
-			if (statusBar.getComponentOrientation() == ComponentOrientation.LEFT_TO_RIGHT)
-				lastPanel.add(new JPanel(), BorderLayout.WEST);
-			else
-				lastPanel.add(new JPanel(), BorderLayout.EAST);
-			lastPanel.add(component, BorderLayout.CENTER);
-			return statusBar;
-		} catch (UnavailableComponentException | NullPointerException exc) {
-			throw new InvalidParameterException(exc);
+			throws ComponentBuildException, UnavailableComponentException {
+		JPanel lastPanel = statusBar.extractLastPanel();
+
+		lastPanel.setLayout(new BorderLayout());
+
+		if (statusBar.getComponentOrientation() == ComponentOrientation.LEFT_TO_RIGHT) {
+			lastPanel.add(new JPanel(), BorderLayout.WEST);
+		} else {
+			lastPanel.add(new JPanel(), BorderLayout.EAST);
 		}
+
+		lastPanel.add(component, BorderLayout.CENTER);
+
+		return statusBar;
 	}
 
 	/**
 	 * Create an empty component for the status bar of the assigned width. The
 	 * default height is 20px.
 	 * 
-	 * @param width.
+	 * @param width The width
 	 * 
 	 * @return A {@link Component} with the new space.
 	 * 
@@ -235,8 +218,8 @@ public final class StatusBarFactory {
 	 * Create an empty component for the status bar of the assigned width and
 	 * height.
 	 * 
-	 * @param width
-	 * @param height
+	 * @param width  The width
+	 * @param height The height
 	 * 
 	 * @return A {@link Component} with the new space.
 	 * 

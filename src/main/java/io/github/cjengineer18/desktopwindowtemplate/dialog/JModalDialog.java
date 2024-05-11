@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import io.github.cjengineer18.desktopwindowtemplate.exception.InvalidParameterException;
+import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
 import io.github.cjengineer18.desktopwindowtemplate.util.Utilities;
 
 /**
@@ -43,7 +43,7 @@ public abstract class JModalDialog extends JDialog {
 
 	/* Private Constants */
 
-	private static final long serialVersionUID = 1311L;
+	private static final long serialVersionUID = 0x13D1;
 
 	/* Public Constants */
 
@@ -178,7 +178,7 @@ public abstract class JModalDialog extends JDialog {
 			y = window.getY() + 10;
 			break;
 		default:
-			throw new InvalidParameterException("Unknown parameter for dialog location");
+			throw new ComponentBuildException("Unknown parameter for dialog location");
 		}
 
 		setLocation(x, y);

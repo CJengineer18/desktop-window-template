@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ import io.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
  */
 public class AsyncProcessException extends Exception {
 
-	private static final long serialVersionUID = 8402899429558462504L;
+	private static final long serialVersionUID = 0x13E1;
 
 	public AsyncProcessException(Throwable throwable) {
 		super(String.format("An error was thrown in an async process: %s", throwable.getMessage()), throwable);

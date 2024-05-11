@@ -38,7 +38,7 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  */
 public class AcceptCancelDialogFooter extends JPanel {
 
-	private static final long serialVersionUID = 205L;
+	private static final long serialVersionUID = 0x13C1;
 
 	// Flags
 
