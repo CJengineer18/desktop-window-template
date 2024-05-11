@@ -103,7 +103,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * Here's all the window build. This method is invoked from
 	 * {@code loadWorkArea(String, int, int, boolean, int)}.
 	 * 
-	 * @throws Exception If any error.
+	 * @throws Exception
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
@@ -118,7 +118,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * method is invoked from {@code loadWorkArea(String, int, int, boolean, int)}.
 	 * By default, this method does nothing, but can be override.
 	 * 
-	 * @throws Exception If any error.
+	 * @throws Exception
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */
@@ -131,7 +131,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * method is invoked from {@code loadWorkArea(String, int, int, boolean, int)}.
 	 * By default, this method does nothing, but can be override.
 	 * 
-	 * @throws Exception If any error.
+	 * @throws Exception
 	 * 
 	 * @see #loadWorkArea(String, int, int, boolean, int)
 	 */

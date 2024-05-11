@@ -53,7 +53,7 @@ public class JStatusBar extends JPanel {
 	 * @param height     The height.
 	 * @param components The components which will be in the bar.
 	 * 
-	 * @throws ComponentBuildException If some of the parameters are invalid.
+	 * @throws ComponentBuildException
 	 */
 	public JStatusBar(int width, int height, Component[] components) throws ComponentBuildException {
 		super(new BorderLayout());
@@ -66,7 +66,7 @@ public class JStatusBar extends JPanel {
 	 * 
 	 * @return The {@link JPanel} with the content of the bar.
 	 * 
-	 * @throws UnavailableComponentException If the component can't be extracted.
+	 * @throws UnavailableComponentException
 	 * 
 	 * @see #setContentSection(JPanel)
 	 */
@@ -83,9 +83,7 @@ public class JStatusBar extends JPanel {
 	 * 
 	 * @param contentSection The new content.
 	 * 
-	 * @throws UnavailableComponentException If {@code contentSection} don't meet to
-	 *                                       be added the bar or some other internal
-	 *                                       error.
+	 * @throws UnavailableComponentException
 	 * 
 	 * @see #getContentSection()
 	 */
@@ -103,7 +101,7 @@ public class JStatusBar extends JPanel {
 	 * 
 	 * @return The last panel.
 	 * 
-	 * @throws UnavailableComponentException If the panel can't be extracted.
+	 * @throws UnavailableComponentException
 	 */
 	public final JPanel extractLastPanel() throws UnavailableComponentException {
 		try {
