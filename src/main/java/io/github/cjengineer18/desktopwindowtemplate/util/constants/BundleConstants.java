@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,11 +31,11 @@ public interface BundleConstants {
 	/**
 	 * Bundle for panel's default text.
 	 */
-	public static final String PANELS_LOCALE = "io.github.cjengineer18.desktopwindowtemplate.resources.bundle.panels";
+	public static final String PANELS_LOCALE = "io.github.cjengineer18.desktopwindowtemplate.locale.panels";
 
 	/**
 	 * Bundle for button's default text.
 	 */
-	public static final String BUTTONS_LOCALE = "io.github.cjengineer18.desktopwindowtemplate.resources.bundle.buttons";
+	public static final String BUTTONS_LOCALE = "io.github.cjengineer18.desktopwindowtemplate.locale.buttons";
 
 }
