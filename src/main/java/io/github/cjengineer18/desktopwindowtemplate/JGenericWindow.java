@@ -291,7 +291,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void addListeners(WindowListener... listeners) {
 		if (listeners != null && listeners.length > 0) {
-			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(l -> windowListeners.add(l));
+			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(windowListeners::add);
 		}
 	}
 
@@ -304,7 +304,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void addListeners(WindowStateListener... listeners) {
 		if (listeners != null && listeners.length > 0) {
-			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(l -> windowStateListeners.add(l));
+			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(windowStateListeners::add);
 		}
 	}
 
@@ -317,8 +317,8 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void enableListeners() {
 		SwingUtilities.invokeLater(() -> {
-			windowListeners.forEach(l -> addWindowListener(l));
-			windowStateListeners.forEach(l -> addWindowStateListener(l));
+			windowListeners.forEach(this::addWindowListener);
+			windowStateListeners.forEach(this::addWindowStateListener);
 		});
 	}
 
@@ -331,7 +331,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		if ((menus != null) && (menus.length > 0)) {
 			JMenuBar jmb = new JMenuBar();
 
-			Arrays.asList(menus).stream().filter(m -> m != null).forEach(m -> jmb.add(m));
+			Arrays.asList(menus).stream().filter(m -> m != null).forEach(jmb::add);
 
 			setJMenuBar(jmb);
 		}
