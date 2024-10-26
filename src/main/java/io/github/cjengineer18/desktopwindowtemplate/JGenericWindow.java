@@ -28,9 +28,11 @@ import java.awt.event.WindowStateListener;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -190,6 +192,10 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		maximizeWindow();
 	}
 
+	public final void recalculateCenter() {
+		setLocation(Utilities.calculateCenter(Toolkit.getDefaultToolkit().getScreenSize(), getPreferredSize()));
+	}
+
 	/**
 	 * Invoke <b>only</b> inside the builder. Here an empty frame is created with
 	 * the required specifications and filled as implemented by
@@ -222,12 +228,10 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		AtomicReference<Exception> asyncException = new AtomicReference<Exception>();
 
 		Dimension screen;
-		int x;
-		int y;
 
 		title = Objects.requireNonNull(title);
 
-		if (((width >= MIN_WINDOW_SIZE.getWidth()) && (height >= MIN_WINDOW_SIZE.getHeight())) && (title != null)) {
+		if ((width >= MIN_WINDOW_SIZE.getWidth()) && (height >= MIN_WINDOW_SIZE.getHeight())) {
 			screen = Toolkit.getDefaultToolkit().getScreenSize();
 
 			originalSize = new Dimension(width, height);
@@ -236,11 +240,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			setTitle(title);
 			setSize(realSize);
 			setPreferredSize(realSize);
-
-			x = (int) ((screen.getWidth() / 2) - (realSize.getWidth() / 2));
-			y = (int) ((screen.getHeight() / 2) - (realSize.getHeight() / 2));
-
-			setLocation(x, y);
+			setLocation(Utilities.calculateCenter(screen, realSize));
 			setResizable(!fixedWindow);
 			tolerableMinimumSize();
 			beforeLoadArea();
@@ -291,7 +291,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void addListeners(WindowListener... listeners) {
 		if (listeners != null && listeners.length > 0) {
-			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(windowListeners::add);
+			windowListeners.addAll(removeNullElements(listeners));
 		}
 	}
 
@@ -304,7 +304,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 */
 	protected final void addListeners(WindowStateListener... listeners) {
 		if (listeners != null && listeners.length > 0) {
-			Arrays.asList(listeners).stream().filter(l -> l != null).forEach(windowStateListeners::add);
+			windowStateListeners.addAll(removeNullElements(listeners));
 		}
 	}
 
@@ -331,8 +331,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		if ((menus != null) && (menus.length > 0)) {
 			JMenuBar jmb = new JMenuBar();
 
-			Arrays.asList(menus).stream().filter(m -> m != null).forEach(jmb::add);
-
+			removeNullElements(menus).forEach(jmb::add);
 			setJMenuBar(jmb);
 		}
 	}
@@ -364,6 +363,14 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	private void executeAfterLoadArea() throws Exception {
 		afterLoadArea();
 		restore();
+	}
+
+	private <Element> List<Element> removeNullElements(List<Element> original) {
+		return original.stream().filter(e -> e != null).collect(Collectors.toList());
+	}
+
+	private <Element> List<Element> removeNullElements(Element[] elements) {
+		return removeNullElements(Arrays.asList(elements));
 	}
 
 }

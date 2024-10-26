@@ -23,6 +23,7 @@ package io.github.cjengineer18.desktopwindowtemplate.util;
 
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Point;
 
 import javax.swing.JFrame;
 
@@ -85,6 +86,17 @@ public final class Utilities {
 		realHeight = ((int) originalSize.getHeight()) + insetValues[0];
 
 		return new Dimension(realWidth, realHeight);
+	}
+
+	public static Point calculateCenter(Dimension screenArea, Dimension windowArea) {
+		int x1 = (int) screenArea.getWidth();
+		int x2 = (int) windowArea.getWidth();
+		int y1 = (int) screenArea.getHeight();
+		int y2 = (int) windowArea.getHeight();
+		int cx = (x1 / 2) - (x2 / 2);
+		int cy = (y1 / 2) - (y2 / 2);
+
+		return new Point(cx, cy);
 	}
 
 }

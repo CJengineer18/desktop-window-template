@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ package io.github.cjengineer18.desktopwindowtemplate.async.task;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Window;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
@@ -103,6 +104,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		this.title = title;
 		this.enableCancel = (options & AT_CANCEL) != 0;
 		this.indeterminate = (options & AT_INDETERMINATE) != 0;
+		this.result = null;
 	}
 
 	// Methods
@@ -124,7 +126,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 			worker.execute();
 			dialog.setVisible(true);
 		} catch (Exception exc) {
-
+			handleError(exc);
 		}
 	}
 
@@ -136,12 +138,11 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 
 		if (worker.hasError()) {
 			handleError(worker.getError());
-			return;
+		} else {
+			this.result = result;
+
+			done(result);
 		}
-
-		this.result = result;
-
-		done(result);
 	}
 
 	/**
@@ -205,21 +206,17 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this,
 					AcceptCancelDialogFooter.ACDF_CENTER_BUTTONS
 							| (enableCancel ? AcceptCancelDialogFooter.ACDF_CANCEL : 0));
-			String[] cardinals = { BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.WEST };
 
 			if (enableCancel) {
-				footer.onCancel(e -> {
-					worker.cancel(true);
-				});
+				footer.onCancel(e -> worker.cancel(true));
 			}
 
 			container.setLayout(new BorderLayout());
 			container.add(BorderLayout.CENTER, panel);
 			container.add(BorderLayout.SOUTH, footer);
 
-			for (String str : cardinals) {
-				container.add(str, new JPanel());
-			}
+			Arrays.asList(BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.WEST)
+					.forEach(cardinal -> container.add(cardinal, new JPanel()));
 		}
 
 	}

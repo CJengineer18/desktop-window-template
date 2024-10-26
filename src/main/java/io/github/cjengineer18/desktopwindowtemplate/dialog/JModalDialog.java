@@ -22,6 +22,7 @@
 package io.github.cjengineer18.desktopwindowtemplate.dialog;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Window;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -141,6 +142,17 @@ public abstract class JModalDialog extends JDialog {
 		pack();
 	}
 
+	public final void recalculateCenter() {
+		Point p;
+
+		if (location == CENTER) {
+			p = Utilities.calculateCenter(window.getPreferredSize(), getPreferredSize());
+			p = new Point(window.getX() + p.x, window.getY() + p.y);
+
+			setLocation(p);
+		}
+	}
+
 	/**
 	 * Invoke <b>only</b> inside the builder. Here an empty frame is created with
 	 * the required specifications and filled as implemented by
@@ -157,8 +169,7 @@ public abstract class JModalDialog extends JDialog {
 		originalSize = new Dimension(width, height);
 		realSize = Utilities.createWorkArea(originalSize);
 
-		int x;
-		int y;
+		Point p;
 
 		setSize(realSize);
 		setPreferredSize(realSize);
@@ -170,18 +181,17 @@ public abstract class JModalDialog extends JDialog {
 
 		switch (location) {
 		case CENTER:
-			x = window.getX() + (int) ((window.getWidth() / 2) - (realSize.getWidth() / 2));
-			y = window.getY() + (int) ((window.getHeight() / 2) - (realSize.getHeight() / 2));
+			p = Utilities.calculateCenter(window.getPreferredSize(), realSize);
+			p = new Point(window.getX() + p.x, window.getY() + p.y);
 			break;
 		case TOP_LEFT:
-			x = window.getX() + 10;
-			y = window.getY() + 10;
+			p = new Point(window.getX() + 10, window.getY() + 10);
 			break;
 		default:
 			throw new ComponentBuildException("Unknown parameter for dialog location");
 		}
 
-		setLocation(x, y);
+		setLocation(p);
 
 		SwingUtilities.invokeLater(() -> {
 			try {

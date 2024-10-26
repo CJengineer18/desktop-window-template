@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,8 @@ package io.github.cjengineer18.desktopwindowtemplate.async.task;
  * 
  * @author CJengineer18
  *
- * @param <Input>
- *            The Input class.
- * @param <Output>
- *            The Output class.
+ * @param <Input>  The Input class.
+ * @param <Output> The Output class.
  * 
  * @see AsyncTask
  */
@@ -49,7 +47,11 @@ public abstract class CustomAsyncTask<Input, Output> extends AbstractAsyncTask<I
 
 	@Override
 	protected final void finish(Output result) {
-		done(result);
+		if (worker.hasError()) {
+			handleError(worker.getError());
+		} else {
+			done(result);
+		}
 	}
 
 	// Abstract methods
