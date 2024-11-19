@@ -41,7 +41,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
-import io.github.cjengineer18.desktopwindowtemplate.util.Utilities;
+import io.github.cjengineer18.desktopwindowtemplate.util.JGWUtilities;
 
 /**
  * Generic window for any desktop application.
@@ -193,7 +193,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	}
 
 	public final void recalculateCenter() {
-		setLocation(Utilities.calculateCenter(Toolkit.getDefaultToolkit().getScreenSize(), getPreferredSize()));
+		setLocation(JGWUtilities.calculateCenter(Toolkit.getDefaultToolkit().getScreenSize(), getSize()));
 	}
 
 	/**
@@ -235,12 +235,12 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 			screen = Toolkit.getDefaultToolkit().getScreenSize();
 
 			originalSize = new Dimension(width, height);
-			realSize = Utilities.createWorkArea(originalSize);
+			realSize = JGWUtilities.createWorkArea(originalSize);
 
 			setTitle(title);
 			setSize(realSize);
 			setPreferredSize(realSize);
-			setLocation(Utilities.calculateCenter(screen, realSize));
+			setLocation(JGWUtilities.calculateCenter(screen, realSize));
 			setResizable(!fixedWindow);
 			tolerableMinimumSize();
 			beforeLoadArea();
@@ -356,7 +356,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * Adjust the minimum size to the minimum tolerable size.
 	 */
 	private void tolerableMinimumSize() {
-		setMinimumSize(Utilities.createWorkArea(MIN_WINDOW_SIZE));
+		setMinimumSize(JGWUtilities.createWorkArea(MIN_WINDOW_SIZE));
 	}
 
 	// Execute before the window loaded and show.

@@ -32,9 +32,9 @@ import javax.swing.JFrame;
  * 
  * @author CJengineer18
  */
-public final class Utilities {
+public final class JGWUtilities {
 
-	private Utilities() {
+	private JGWUtilities() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -89,10 +89,10 @@ public final class Utilities {
 	}
 
 	public static Point calculateCenter(Dimension screenArea, Dimension windowArea) {
-		int x1 = (int) screenArea.getWidth();
-		int x2 = (int) windowArea.getWidth();
-		int y1 = (int) screenArea.getHeight();
-		int y2 = (int) windowArea.getHeight();
+		int x1 = screenArea.width;
+		int x2 = windowArea.width;
+		int y1 = screenArea.height;
+		int y2 = windowArea.height;
 		int cx = (x1 / 2) - (x2 / 2);
 		int cy = (y1 / 2) - (y2 / 2);
 

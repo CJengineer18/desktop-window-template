@@ -23,8 +23,9 @@ package io.github.cjengineer18.desktopwindowtemplate.async.task;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.Window;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
@@ -57,7 +58,6 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 
 	private Window parent;
 	private Dialog dialog;
-	private JPanel panel;
 	private String title;
 	private boolean enableCancel;
 	private boolean indeterminate;
@@ -116,11 +116,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	@SafeVarargs
 	public final void execute(Input... inputs) {
 		try {
-			ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
-
 			worker = new AsyncWorker<Input, Output>(this, inputs);
-			panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage"))
-					: new ProgressPanel(new String());
 			dialog = new Dialog();
 
 			worker.execute();
@@ -167,9 +163,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @param delta The progress change.
 	 */
 	protected final void addDelta(int delta) {
-		if (!indeterminate) {
-			((ProgressPanel) panel).grow(delta);
-		}
+		dialog.addDelta(delta);
 	}
 
 	/**
@@ -178,9 +172,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @param message The new message.
 	 */
 	protected final void updateMessage(String message) {
-		if (!indeterminate) {
-			((ProgressPanel) panel).setMessage(message);
-		}
+		dialog.updateMessage(message);
 	}
 
 	// Private classes
@@ -189,10 +181,12 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 
 		private static final long serialVersionUID = 1L;
 
-		Dialog() throws Exception {
-			super(parent, title);
+		JPanel panel;
 
-			loadWorkArea(250, 120);
+		Dialog() throws Exception {
+			super(parent, title, JModalDialog.CENTER);
+
+			createNewInstance();
 		}
 
 		@Override
@@ -203,6 +197,9 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
+			ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
+			panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage"), getWidth(), 6, 2)
+					: new ProgressPanel(new String());
 			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this,
 					AcceptCancelDialogFooter.ACDF_CENTER_BUTTONS
 							| (enableCancel ? AcceptCancelDialogFooter.ACDF_CANCEL : 0));
@@ -214,11 +211,27 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 			container.setLayout(new BorderLayout());
 			container.add(BorderLayout.CENTER, panel);
 			container.add(BorderLayout.SOUTH, footer);
-
-			Arrays.asList(BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.WEST)
-					.forEach(cardinal -> container.add(cardinal, new JPanel()));
 		}
 
+		void addDelta(int delta) {
+			if (!indeterminate) {
+				((ProgressPanel) panel).grow(delta);
+			}
+		}
+
+		void updateMessage(String message) {
+			if (!indeterminate) {
+				((ProgressPanel) panel).setMessage(message);
+			}
+		}
+
+		private void createNewInstance() throws Exception {
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			int w = (int) Math.round(screen.getWidth() / 5.464);
+			int h = (int) Math.round(screen.getHeight() / 6.4);
+
+			loadWorkArea(w, h);
+		}
 	}
 
 }

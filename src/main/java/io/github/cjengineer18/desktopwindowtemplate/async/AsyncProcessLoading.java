@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2023 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,9 @@ package io.github.cjengineer18.desktopwindowtemplate.async;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.Window;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
@@ -33,7 +34,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import io.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
@@ -110,14 +110,19 @@ public final class AsyncProcessLoading {
 	 */
 	public static void loadAsyncProcess(Window parent, IProcess process, String title, String message)
 			throws AsyncProcessException {
-		loadAsyncProcess(parent, (Runnable) () -> {
-			try {
-				process.execute();
-			} catch (Exception exc) {
-				THREAD_ERROR.set(exc);
-			} finally {
-				dialog.dispose();
+		loadAsyncProcess(parent, new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					process.execute();
+				} catch (Exception exc) {
+					THREAD_ERROR.set(exc);
+				} finally {
+					dialog.dispose();
+				}
 			}
+
 		}, title, message);
 	}
 
@@ -172,6 +177,11 @@ public final class AsyncProcessLoading {
 	@FunctionalInterface
 	public interface IProcess {
 
+		/**
+		 * Execute the process.
+		 * 
+		 * @throws Exception
+		 */
 		void execute() throws Exception;
 
 	}
@@ -183,16 +193,12 @@ public final class AsyncProcessLoading {
 
 		@Override
 		public Thread newThread(Runnable run) {
-			String id = String.format(Locale.ENGLISH, "%s-DaemonThread-%d", AsyncProcessLoading.class.getSimpleName(),
-					COUNTER.incrementAndGet());
+			String id = String.format(Locale.ENGLISH, "APLDaemonThread-%d", COUNTER.incrementAndGet());
 			Thread th = new Thread(run);
 
 			th.setDaemon(true);
 			th.setName(id);
-
-			th.setUncaughtExceptionHandler((th0, tw0) -> {
-				THREAD_ERROR.set(tw0);
-			});
+			th.setUncaughtExceptionHandler((th0, tw0) -> THREAD_ERROR.set(tw0));
 
 			return th;
 		}
@@ -211,7 +217,7 @@ public final class AsyncProcessLoading {
 
 			this.message = message;
 
-			loadWorkArea(250, 120);
+			createNewInstance();
 		}
 
 		@Override
@@ -224,13 +230,16 @@ public final class AsyncProcessLoading {
 			Container container = getContentPane();
 
 			container.setLayout(new BorderLayout());
-			container.add(BorderLayout.CENTER, new WaitingPanel(message));
-
-			Arrays.asList(BorderLayout.SOUTH, BorderLayout.EAST, BorderLayout.WEST).forEach(cardinal -> {
-				container.add(cardinal, new JPanel());
-			});
+			container.add(BorderLayout.CENTER, new WaitingPanel(message, getWidth()));
 		}
 
+		private void createNewInstance() throws Exception {
+			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+			int w = (int) Math.round(screen.getWidth() / 5.464);
+			int h = (int) Math.round(screen.getHeight() / 6.4);
+
+			loadWorkArea(w, h);
+		}
 	}
 
 }

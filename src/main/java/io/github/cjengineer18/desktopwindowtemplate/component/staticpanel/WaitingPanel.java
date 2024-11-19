@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2018-2022 Cristian José Jiménez Diazgranados
+ * Copyright (c) 2018-2024 Cristian José Jiménez Diazgranados
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,10 @@
  */
 package io.github.cjengineer18.desktopwindowtemplate.component.staticpanel;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,6 +34,7 @@ import javax.swing.JProgressBar;
  * A waiting panel.
  * 
  * @see com.github.cjengineer18.desktopwindowtemplate.util.async.AsyncProcessLoading
+ * @see com.github.cjengineer18.desktopwindowtemplate.util.async.task.AsyncTask
  * 
  * @author Cristian Jimenez
  */
@@ -40,17 +44,36 @@ public class WaitingPanel extends JPanel {
 
 	private String message;
 
-	public WaitingPanel(String message) {
-		super(new BorderLayout());
-		this.message = message;
-		createNewInstance();
+	public WaitingPanel(String message, int width) {
+		this(message, width, 0, 8);
 	}
 
-	private void createNewInstance() {
-		add(BorderLayout.CENTER, new JLabel(message));
+	public WaitingPanel(String message, int width, int topMargin, int bottomMargin) {
+		super(new GridBagLayout());
+
+		this.message = message;
+
+		createNewInstance(width, topMargin, bottomMargin);
+	}
+
+	private void createNewInstance(int width, int topMargin, int bottomMargin) {
 		JProgressBar bar = new JProgressBar();
+		GridBagConstraints gbc = new GridBagConstraints();
+		Insets insets = new Insets(topMargin, 4, bottomMargin, 4);
+
 		bar.setIndeterminate(true);
-		add(BorderLayout.SOUTH, bar);
+		bar.setPreferredSize(new Dimension(width - 12, 14));
+
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.insets = insets;
+
+		add(new JLabel(message), gbc);
+
+		gbc.gridy = 1;
+
+		add(bar, gbc);
 	}
 
 }

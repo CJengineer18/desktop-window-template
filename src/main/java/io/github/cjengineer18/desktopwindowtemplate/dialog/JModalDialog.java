@@ -32,7 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import io.github.cjengineer18.desktopwindowtemplate.exception.ComponentBuildException;
-import io.github.cjengineer18.desktopwindowtemplate.util.Utilities;
+import io.github.cjengineer18.desktopwindowtemplate.util.JGWUtilities;
 
 /**
  * Generic modal dialog for desktop applications.
@@ -48,8 +48,11 @@ public abstract class JModalDialog extends JDialog {
 
 	/* Public Constants */
 
-	public static final int CENTER = 0;
-	public static final int TOP_LEFT = 1;
+	/** Shows the dialog in the center of the parent */
+	public static final int CENTER = 0x13D1C1;
+
+	/** Shows the dialog in the top left plus 10px offset of the parent */
+	public static final int TOP_LEFT = 0x13D1C2;
 
 	/* Protected Fields */
 
@@ -146,7 +149,7 @@ public abstract class JModalDialog extends JDialog {
 		Point p;
 
 		if (location == CENTER) {
-			p = Utilities.calculateCenter(window.getPreferredSize(), getPreferredSize());
+			p = JGWUtilities.calculateCenter(window.getSize(), getPreferredSize());
 			p = new Point(window.getX() + p.x, window.getY() + p.y);
 
 			setLocation(p);
@@ -156,18 +159,20 @@ public abstract class JModalDialog extends JDialog {
 	/**
 	 * Invoke <b>only</b> inside the builder. Here an empty frame is created with
 	 * the required specifications and filled as implemented by
-	 * {@code beforeLoadArea()} and {@code workArea()}. The position of the dialog
-	 * is +10px to the bottom and +10px to the right according to the parent's
-	 * top-left corner.
+	 * {@code beforeLoadArea()} and {@code workArea()}. The position depends of the
+	 * {@code TOP_LEFT} or the {@code CENTER} constants.
 	 * 
 	 * @param width  The width.
 	 * @param height The height
 	 * 
 	 * @throws Exception If any error.
+	 * 
+	 * @see #TOP_LEFT
+	 * @see #CENTER
 	 */
 	protected final void loadWorkArea(int width, int height) throws Exception {
 		originalSize = new Dimension(width, height);
-		realSize = Utilities.createWorkArea(originalSize);
+		realSize = JGWUtilities.createWorkArea(originalSize);
 
 		Point p;
 
@@ -181,7 +186,7 @@ public abstract class JModalDialog extends JDialog {
 
 		switch (location) {
 		case CENTER:
-			p = Utilities.calculateCenter(window.getPreferredSize(), realSize);
+			p = JGWUtilities.calculateCenter(window.getSize(), realSize);
 			p = new Point(window.getX() + p.x, window.getY() + p.y);
 			break;
 		case TOP_LEFT:
