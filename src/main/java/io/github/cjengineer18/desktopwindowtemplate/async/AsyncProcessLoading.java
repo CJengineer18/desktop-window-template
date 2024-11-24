@@ -21,9 +21,11 @@
  */
 package io.github.cjengineer18.desktopwindowtemplate.async;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.util.Locale;
@@ -34,9 +36,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
-import io.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
 import io.github.cjengineer18.desktopwindowtemplate.dialog.JModalDialog;
 import io.github.cjengineer18.desktopwindowtemplate.exception.AsyncProcessException;
 import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
@@ -211,6 +214,7 @@ public final class AsyncProcessLoading {
 		private static final long serialVersionUID = 1L;
 
 		private String message;
+		private JProgressBar jpb;
 
 		Dialog(Window window, String title, String message) throws Exception {
 			super(window, title, JModalDialog.CENTER);
@@ -228,9 +232,30 @@ public final class AsyncProcessLoading {
 		@Override
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
+			GridBagConstraints gbc = new GridBagConstraints();
+			int insetX = 6;
+			int insetY = 2;
 
-			container.setLayout(new BorderLayout());
-			container.add(BorderLayout.CENTER, new WaitingPanel(message, getWidth()));
+			jpb = new JProgressBar();
+
+			jpb.setIndeterminate(true);
+			jpb.setPreferredSize(new Dimension(getWidth() - 22, 14));
+
+			container.setLayout(new GridBagLayout());
+
+			gbc.anchor = GridBagConstraints.BASELINE_LEADING;
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.insets = new Insets(insetX, insetY, insetX, insetY);
+			gbc.fill = GridBagConstraints.BOTH;
+
+			container.add(new JLabel(message), gbc);
+
+			gbc.anchor = GridBagConstraints.BELOW_BASELINE_LEADING;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0, insetY, insetX, insetY);
+
+			container.add(jpb, gbc);
 		}
 
 		private void createNewInstance() throws Exception {

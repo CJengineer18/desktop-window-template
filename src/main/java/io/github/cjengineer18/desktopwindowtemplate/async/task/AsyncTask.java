@@ -26,15 +26,17 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
 import io.github.cjengineer18.desktopwindowtemplate.async.AsyncProcessLoading;
 import io.github.cjengineer18.desktopwindowtemplate.component.AcceptCancelDialogFooter;
-import io.github.cjengineer18.desktopwindowtemplate.component.staticpanel.ProgressPanel;
-import io.github.cjengineer18.desktopwindowtemplate.component.staticpanel.WaitingPanel;
 import io.github.cjengineer18.desktopwindowtemplate.dialog.JModalDialog;
 import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstants;
 
@@ -49,8 +51,14 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  */
 public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
 
+	// Private constants
+
+	private static final String DEFAULT_TITLE = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE)
+			.getString("loadingTitle");
+
 	// Public constants
 
+	public static final int NONE = 0x0;
 	public static final int AT_INDETERMINATE = 0x01;
 	public static final int AT_CANCEL = 0x10;
 
@@ -61,7 +69,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	private String title;
 	private boolean enableCancel;
 	private boolean indeterminate;
-	private int step;
+	private long step;
 
 	// Constructors
 
@@ -75,7 +83,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @see AsyncProcessLoading
 	 */
 	public AsyncTask(Window parent) {
-		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("loadingTitle"), 0, 17);
+		this(parent, DEFAULT_TITLE, 0, 17);
 	}
 
 	/**
@@ -84,8 +92,34 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @param parent A window parent. If {@code null}, a default frame is used.
 	 * @param step   The progress step.
 	 */
-	public AsyncTask(Window parent, int step) {
-		this(parent, ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE).getString("progressTitle"), step, 16);
+	public AsyncTask(Window parent, long step) {
+		this(parent, DEFAULT_TITLE, step, 16);
+	}
+
+	/**
+	 * Creates a new async task.
+	 * 
+	 * @param parent A window parent. If {@code null}, a default frame is used.
+	 * @param title  A title for the dialog title.
+	 */
+	public AsyncTask(Window parent, String title) {
+		this(parent, title, 0, 17);
+	}
+
+	/**
+	 * Creates a new async task.
+	 * 
+	 * @param parent  A window parent. If {@code null}, a default frame is used.
+	 * @param options The options for the task. Only this options are accepted:
+	 *                {@code NONE}, {@code AT_CANCEL}, {@code AT_INDETERMINATE}. The
+	 *                options can be combined.
+	 * 
+	 * @see #NONE
+	 * @see #AT_INDETERMINATE
+	 * @see #AT_CANCEL
+	 */
+	public AsyncTask(Window parent, int options) {
+		this(parent, DEFAULT_TITLE, 0, options);
 	}
 
 	/**
@@ -95,10 +129,14 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * @param title   A title for the dialog title.
 	 * @param step    The progress step.
 	 * @param options The options for the task. Only this options are accepted:
-	 *                {@link #AT_CANCEL}, {@link #AT_INDETERMINATE}. The options can
-	 *                be combined.
+	 *                {@code NONE}, {@code AT_CANCEL}, {@code AT_INDETERMINATE}. The
+	 *                options can be combined.
+	 * 
+	 * @see #NONE
+	 * @see #AT_INDETERMINATE
+	 * @see #AT_CANCEL
 	 */
-	public AsyncTask(Window parent, String title, int step, int options) {
+	public AsyncTask(Window parent, String title, long step, int options) {
 		this.parent = parent;
 		this.step = step;
 		this.title = title;
@@ -108,7 +146,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	}
 
 	// Methods
-	// For overrider methods, see parent's documentation.
+	// For override methods, see parent's documentation.
 
 	// Public methods
 
@@ -162,7 +200,7 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 * 
 	 * @param delta The progress change.
 	 */
-	protected final void addDelta(int delta) {
+	protected final void addDelta(long delta) {
 		dialog.addDelta(delta);
 	}
 
@@ -181,7 +219,8 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 
 		private static final long serialVersionUID = 1L;
 
-		JPanel panel;
+		JProgressBar jpb;
+		JLabel messageLabel;
 
 		Dialog() throws Exception {
 			super(parent, title, JModalDialog.CENTER);
@@ -198,30 +237,49 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		protected void workArea() throws Exception {
 			Container container = getContentPane();
 			ResourceBundle panels = ResourceBundle.getBundle(BundleConstants.PANELS_LOCALE);
-			panel = indeterminate ? new WaitingPanel(panels.getString("loadingMessage"), getWidth(), 6, 2)
-					: new ProgressPanel(new String());
 			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this,
 					AcceptCancelDialogFooter.ACDF_CENTER_BUTTONS
 							| (enableCancel ? AcceptCancelDialogFooter.ACDF_CANCEL : 0));
+			JPanel labelContainer = new JPanel(new BorderLayout(6, 8));
+			List<String> sizeZones = Arrays.asList(BorderLayout.EAST, BorderLayout.WEST);
+
+			jpb = new JProgressBar();
+			messageLabel = new JLabel(panels.getString("loadingMessage"));
+
+			jpb.setPreferredSize(new Dimension(getWidth(), 14));
 
 			if (enableCancel) {
 				footer.onCancel(e -> worker.cancel(true));
 			}
 
-			container.setLayout(new BorderLayout());
-			container.add(BorderLayout.CENTER, panel);
+			if (indeterminate) {
+				jpb.setIndeterminate(true);
+			} else {
+				jpb.setMinimum(0);
+				jpb.setMaximum(100);
+				jpb.setStringPainted(true);
+			}
+
+			labelContainer.add(BorderLayout.CENTER, messageLabel);
+			sizeZones.forEach(cardinal -> labelContainer.add(cardinal, new JPanel()));
+
+			container.setLayout(new BorderLayout(6, 8));
+			container.add(BorderLayout.NORTH, labelContainer);
+			container.add(BorderLayout.CENTER, jpb);
 			container.add(BorderLayout.SOUTH, footer);
+
+			sizeZones.forEach(cardinal -> container.add(cardinal, new JPanel()));
 		}
 
-		void addDelta(int delta) {
+		void addDelta(long delta) {
 			if (!indeterminate) {
-				((ProgressPanel) panel).grow(delta);
+				jpb.setValue(jpb.getValue() + (int) delta);
 			}
 		}
 
 		void updateMessage(String message) {
 			if (!indeterminate) {
-				((ProgressPanel) panel).setMessage(message);
+				messageLabel.setText(message);
 			}
 		}
 

@@ -77,9 +77,8 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	 * Main window only. You must show a confirmation message before close. The
 	 * message depends of the implemented window's listener.
 	 * 
-	 * @see #enableListeners()
-	 * @see #addListeners(WindowListener...)
-	 * @see #addListeners(WindowStateListener...)
+	 * @see #addWindowListener(WindowListener)
+	 * @see #addWindowStateListener(WindowStateListener)
 	 */
 	public static final int CONFIRM_AT_CLOSE = 1;
 
@@ -177,6 +176,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	public final void restore() {
 		setSize(realSize);
 		setPreferredSize(realSize);
+		recalculateCenter();
 		pack();
 		setVisible(true);
 	}
@@ -281,45 +281,22 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 		}
 	}
 
-	/**
-	 * Add the listener to the window.
-	 * 
-	 * @param listeners Objects which listen the window changes.
-	 * 
-	 * 
-	 * @see #enableListeners()
-	 */
-	protected final void addListeners(WindowListener... listeners) {
-		if (listeners != null && listeners.length > 0) {
-			windowListeners.addAll(removeNullElements(listeners));
-		}
+	@Override
+	public synchronized void addWindowListener(WindowListener arg0) {
+		windowListeners.add(arg0);
+
+		super.addWindowListener(arg0);
 	}
 
-	/**
-	 * Add the listener to the window.
-	 * 
-	 * @param listeners Objects which listen the window changes.
-	 * 
-	 * @see #enableListeners()
-	 */
-	protected final void addListeners(WindowStateListener... listeners) {
-		if (listeners != null && listeners.length > 0) {
-			windowStateListeners.addAll(removeNullElements(listeners));
-		}
+	@Override
+	public synchronized void addWindowStateListener(WindowStateListener arg0) {
+		windowStateListeners.add(arg0);
+
+		super.addWindowStateListener(arg0);
 	}
 
-	/**
-	 * Enable the listeners added by {@code addListeners(WindowListener...)} and
-	 * {@code addListeners(WindowStateListener...)}.
-	 * 
-	 * @see #addListeners(WindowListener...)
-	 * @see #addListeners(WindowStateListener...)
-	 */
-	protected final void enableListeners() {
-		SwingUtilities.invokeLater(() -> {
-			windowListeners.forEach(this::addWindowListener);
-			windowStateListeners.forEach(this::addWindowStateListener);
-		});
+	protected final void enableListeners(boolean enable) {
+		// TODO: Rebuild
 	}
 
 	/**
@@ -362,7 +339,10 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 	// Execute before the window loaded and show.
 	private void executeAfterLoadArea() throws Exception {
 		afterLoadArea();
-		restore();
+
+		if (!(isResizable() && getExtendedState() == JFrame.MAXIMIZED_BOTH)) {
+			restore();
+		}
 	}
 
 	private <Element> List<Element> removeNullElements(List<Element> original) {
