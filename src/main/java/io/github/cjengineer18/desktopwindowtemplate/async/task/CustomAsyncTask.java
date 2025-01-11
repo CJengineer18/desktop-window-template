@@ -33,7 +33,13 @@ package io.github.cjengineer18.desktopwindowtemplate.async.task;
  */
 public abstract class CustomAsyncTask<Input, Output> extends AbstractAsyncTask<Input, Output> {
 
-	// Methods
+	// Public methods
+
+	public final boolean cancel() {
+		return worker.cancel(true);
+	}
+
+	// Override Methods
 	// For overrider methods, see parent's documentation.
 
 	@SafeVarargs
@@ -58,7 +64,7 @@ public abstract class CustomAsyncTask<Input, Output> extends AbstractAsyncTask<I
 
 	/**
 	 * Executes in the main thread before the background task begins. Useful for
-	 * create and show custom "loading" ui.
+	 * create and show custom "loading" UI.
 	 */
 	protected abstract void beforeExecution();
 

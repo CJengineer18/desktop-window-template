@@ -21,17 +21,16 @@
  */
 package io.github.cjengineer18.desktopwindowtemplate.async.task;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.WindowConstants;
 
@@ -59,8 +58,8 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	// Public constants
 
 	public static final int NONE = 0x0;
-	public static final int AT_INDETERMINATE = 0x01;
-	public static final int AT_CANCEL = 0x10;
+	public static final int INDETERMINATE = 0x01;
+	public static final int CANCEL = 0x10;
 
 	// Fields
 
@@ -115,8 +114,8 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 *                options can be combined.
 	 * 
 	 * @see #NONE
-	 * @see #AT_INDETERMINATE
-	 * @see #AT_CANCEL
+	 * @see #INDETERMINATE
+	 * @see #CANCEL
 	 */
 	public AsyncTask(Window parent, int options) {
 		this(parent, DEFAULT_TITLE, 0, options);
@@ -133,15 +132,15 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 	 *                options can be combined.
 	 * 
 	 * @see #NONE
-	 * @see #AT_INDETERMINATE
-	 * @see #AT_CANCEL
+	 * @see #INDETERMINATE
+	 * @see #CANCEL
 	 */
 	public AsyncTask(Window parent, String title, long step, int options) {
 		this.parent = parent;
 		this.step = step;
 		this.title = title;
-		this.enableCancel = (options & AT_CANCEL) != 0;
-		this.indeterminate = (options & AT_INDETERMINATE) != 0;
+		this.enableCancel = (options & CANCEL) != 0;
+		this.indeterminate = (options & INDETERMINATE) != 0;
 		this.result = null;
 	}
 
@@ -240,17 +239,19 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 			AcceptCancelDialogFooter footer = new AcceptCancelDialogFooter(this,
 					AcceptCancelDialogFooter.ACDF_CENTER_BUTTONS
 							| (enableCancel ? AcceptCancelDialogFooter.ACDF_CANCEL : 0));
-			JPanel labelContainer = new JPanel(new BorderLayout(6, 8));
-			List<String> sizeZones = Arrays.asList(BorderLayout.EAST, BorderLayout.WEST);
+			GridBagConstraints gbc = new GridBagConstraints();
+			int insetX = 6;
+			int insetY = 2;
 
-			jpb = new JProgressBar();
 			messageLabel = new JLabel(panels.getString("loadingMessage"));
-
-			jpb.setPreferredSize(new Dimension(getWidth(), 14));
 
 			if (enableCancel) {
 				footer.onCancel(e -> worker.cancel(true));
 			}
+
+			jpb = new JProgressBar();
+
+			jpb.setPreferredSize(new Dimension(getWidth() - 22, 14));
 
 			if (indeterminate) {
 				jpb.setIndeterminate(true);
@@ -260,15 +261,27 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 				jpb.setStringPainted(true);
 			}
 
-			labelContainer.add(BorderLayout.CENTER, messageLabel);
-			sizeZones.forEach(cardinal -> labelContainer.add(cardinal, new JPanel()));
+			container.setLayout(new GridBagLayout());
 
-			container.setLayout(new BorderLayout(6, 8));
-			container.add(BorderLayout.NORTH, labelContainer);
-			container.add(BorderLayout.CENTER, jpb);
-			container.add(BorderLayout.SOUTH, footer);
+			gbc.anchor = GridBagConstraints.ABOVE_BASELINE_LEADING;
+			gbc.gridx = 0;
+			gbc.gridy = 0;
+			gbc.insets = new Insets(insetX, insetY, insetX, insetY);
+			gbc.fill = GridBagConstraints.BOTH;
 
-			sizeZones.forEach(cardinal -> container.add(cardinal, new JPanel()));
+			container.add(messageLabel, gbc);
+
+			gbc.anchor = GridBagConstraints.BASELINE_LEADING;
+			gbc.gridy = 1;
+			gbc.insets = new Insets(0, insetY, 0, insetY);
+
+			container.add(jpb, gbc);
+
+			gbc.anchor = GridBagConstraints.BELOW_BASELINE_LEADING;
+			gbc.gridy = 2;
+			gbc.insets = new Insets(insetX, insetY, insetX, 0);
+
+			container.add(footer, gbc);
 		}
 
 		void addDelta(long delta) {
@@ -286,9 +299,10 @@ public abstract class AsyncTask<Input, Output> extends AbstractAsyncTask<Input, 
 		private void createNewInstance() throws Exception {
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int w = (int) Math.round(screen.getWidth() / 5.464);
-			int h = (int) Math.round(screen.getHeight() / 6.4);
 
-			loadWorkArea(w, h);
+			w = w <= AsyncProcessLoading.DIALOG_MAX_WIDTH ? w : AsyncProcessLoading.DIALOG_MAX_WIDTH;
+
+			loadWorkArea(w, 100);
 		}
 	}
 

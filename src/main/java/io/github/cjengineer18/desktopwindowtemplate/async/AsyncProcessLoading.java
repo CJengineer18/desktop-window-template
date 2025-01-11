@@ -51,6 +51,9 @@ import io.github.cjengineer18.desktopwindowtemplate.util.constants.BundleConstan
  */
 public final class AsyncProcessLoading {
 
+	/** Max width for all loading dialogs */
+	public static final int DIALOG_MAX_WIDTH = 800;
+
 	// The thread exception reference
 	private static final AtomicReference<Throwable> THREAD_ERROR = new AtomicReference<Throwable>();
 
@@ -261,9 +264,10 @@ public final class AsyncProcessLoading {
 		private void createNewInstance() throws Exception {
 			Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 			int w = (int) Math.round(screen.getWidth() / 5.464);
-			int h = (int) Math.round(screen.getHeight() / 6.4);
 
-			loadWorkArea(w, h);
+			w = w <= DIALOG_MAX_WIDTH ? w : DIALOG_MAX_WIDTH;
+
+			loadWorkArea(w, 100);
 		}
 	}
 
