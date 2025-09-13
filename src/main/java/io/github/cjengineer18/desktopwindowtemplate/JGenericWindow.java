@@ -261,7 +261,7 @@ public abstract class JGenericWindow extends JFrame implements Serializable {
 						String.format(Locale.ENGLISH, "typeClosingWindow = %d?", typeClosingWindow));
 			}
 
-			SwingUtilities.invokeLater(() -> {
+			SwingUtilities.invokeAndWait(() -> {
 				try {
 					workArea();
 					pack();
